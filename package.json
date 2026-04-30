@@ -1,0 +1,25 @@
+{
+  "name": "quickshop",
+  "version": "1.0.0",
+  "description": "Backend API for QuickShop eCommerce landing page with idempotent order system",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "keywords": [
+    "express",
+    "mongodb",
+    "mongoose"
+  ],
+  "author": "Rifat Hossen",
+  "license": "ISC",
+  "type": "module",
+  "dependencies": {
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "mongodb": "^7.2.0",
+    "mongoose": "^9.6.1",
+    "nodemon": "^3.1.14"
+  }
+}
