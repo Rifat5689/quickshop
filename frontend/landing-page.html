@@ -1,0 +1,1218 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Premium Product Landing Page</title>
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+  :root {
+    --brand: #C8392B;
+    --brand-dark: #9B2B1E;
+    --brand-light: #FDECEA;
+    --accent: #F5A623;
+    --text: #1A1A1A;
+    --muted: #6B6B6B;
+    --border: #E8E3DC;
+    --bg: #FAF8F5;
+    --white: #FFFFFF;
+    --success: #1A7A45;
+    --success-light: #E6F5EC;
+    --warning: #B45309;
+    --warning-light: #FEF3C7;
+    --danger: #C8392B;
+    --danger-light: #FDECEA;
+    --shadow-sm: 0 1px 4px rgba(0,0,0,0.08);
+    --shadow-md: 0 4px 20px rgba(0,0,0,0.10);
+    --shadow-lg: 0 12px 40px rgba(0,0,0,0.15);
+    --radius: 12px;
+    --radius-sm: 8px;
+    --radius-lg: 20px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Hind Siliguri', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    max-width: 480px;
+    margin: 0 auto;
+    font-size: 15px;
+    line-height: 1.6;
+  }
+
+  /* ── GALLERY ── */
+  .gallery-wrap {
+    position: relative;
+    background: #f0ece6;
+    overflow: hidden;
+  }
+
+  .gallery-main {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+    display: block;
+    transition: opacity 0.35s ease;
+  }
+
+  .gallery-dots {
+    position: absolute;
+    bottom: 14px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 7px;
+  }
+
+  .dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.5);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .dot.active {
+    background: white;
+    transform: scale(1.3);
+  }
+
+  .gallery-thumbs {
+    display: flex;
+    gap: 8px;
+    padding: 10px 14px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    background: #ece8e2;
+  }
+
+  .gallery-thumbs::-webkit-scrollbar { display: none; }
+
+  .thumb {
+    width: 60px; height: 60px;
+    border-radius: 8px;
+    object-fit: cover;
+    flex-shrink: 0;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: border-color 0.2s;
+  }
+
+  .thumb.active { border-color: var(--brand); }
+
+  /* ── BADGES ── */
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 20px;
+    letter-spacing: 0.3px;
+  }
+
+  .badge-success { background: var(--success-light); color: var(--success); }
+  .badge-warning { background: var(--warning-light); color: var(--warning); }
+  .badge-danger  { background: var(--danger-light);  color: var(--danger);  }
+
+  /* ── PRODUCT INFO ── */
+  .product-info {
+    background: var(--white);
+    padding: 22px 18px 18px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .product-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 26px;
+    font-weight: 900;
+    line-height: 1.2;
+    color: var(--text);
+    margin-bottom: 8px;
+  }
+
+  .product-tagline {
+    font-size: 15px;
+    color: var(--muted);
+    margin-bottom: 14px;
+  }
+
+  .price-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 14px;
+  }
+
+  .price-now {
+    font-size: 30px;
+    font-weight: 700;
+    color: var(--brand);
+    letter-spacing: -0.5px;
+  }
+
+  .price-was {
+    font-size: 17px;
+    color: #aaa;
+    text-decoration: line-through;
+  }
+
+  .discount-badge {
+    background: var(--brand);
+    color: white;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 3px 9px;
+    border-radius: 6px;
+  }
+
+  .desc-short {
+    font-size: 14px;
+    color: var(--muted);
+    line-height: 1.65;
+    margin-bottom: 12px;
+  }
+
+  .desc-toggle {
+    font-size: 13px;
+    color: var(--brand);
+    cursor: pointer;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    border: none;
+    background: none;
+    padding: 0;
+  }
+
+  .desc-long {
+    display: none;
+    font-size: 14px;
+    color: var(--muted);
+    line-height: 1.7;
+    margin-top: 10px;
+  }
+
+  .desc-long.open { display: block; }
+
+  /* ── SECTIONS ── */
+  .section {
+    background: var(--white);
+    margin-top: 10px;
+    padding: 18px;
+  }
+
+  .section-title {
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--muted);
+    margin-bottom: 14px;
+  }
+
+  /* ── ORDER CONTROLS ── */
+  .qty-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 14px;
+  }
+
+  .qty-label { font-size: 14px; color: var(--text); font-weight: 500; flex: 1; }
+
+  .qty-ctrl {
+    display: flex;
+    align-items: center;
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+
+  .qty-btn {
+    width: 38px; height: 38px;
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    color: var(--brand);
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s;
+  }
+
+  .qty-btn:active { background: var(--brand-light); }
+
+  .qty-num {
+    width: 44px;
+    text-align: center;
+    font-size: 17px;
+    font-weight: 700;
+    border: none;
+    border-left: 1px solid var(--border);
+    border-right: 1px solid var(--border);
+    outline: none;
+    -moz-appearance: textfield;
+    background: var(--white);
+  }
+
+  .qty-num::-webkit-outer-spin-button,
+  .qty-num::-webkit-inner-spin-button { -webkit-appearance: none; }
+
+  /* ── DELIVERY OPTIONS ── */
+  .delivery-opts {
+    display: flex;
+    gap: 10px;
+  }
+
+  .delivery-opt {
+    flex: 1;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius);
+    padding: 12px 10px;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+  }
+
+  .delivery-opt.selected {
+    border-color: var(--brand);
+    background: var(--brand-light);
+  }
+
+  .delivery-opt-name { font-size: 13px; font-weight: 600; color: var(--text); }
+  .delivery-opt-price { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+  .opt-check {
+    position: absolute;
+    top: 8px; right: 8px;
+    width: 18px; height: 18px;
+    background: var(--brand);
+    border-radius: 50%;
+    display: none;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .delivery-opt.selected .opt-check { display: flex; }
+
+  .opt-check::after {
+    content: '';
+    width: 5px; height: 9px;
+    border: 2px solid white;
+    border-top: none;
+    border-left: none;
+    transform: rotate(45deg) translate(-1px,-1px);
+  }
+
+  /* ── PRICE SUMMARY ── */
+  .price-summary {
+    background: var(--bg);
+    border-radius: var(--radius);
+    padding: 14px;
+    margin-top: 14px;
+  }
+
+  .ps-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+    padding: 4px 0;
+    color: var(--muted);
+  }
+
+  .ps-row.total {
+    border-top: 1.5px solid var(--border);
+    margin-top: 8px;
+    padding-top: 10px;
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--text);
+  }
+
+  .ps-discount { color: var(--success); }
+
+  /* ── FORM FIELDS ── */
+  .field-group { margin-bottom: 14px; }
+
+  .field-label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 6px;
+  }
+
+  .field-input {
+    width: 100%;
+    height: 46px;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 0 14px;
+    font-size: 15px;
+    font-family: 'Hind Siliguri', sans-serif;
+    color: var(--text);
+    background: var(--white);
+    transition: border-color 0.2s;
+    outline: none;
+  }
+
+  .field-input:focus { border-color: var(--brand); }
+
+  .field-input::placeholder { color: #bbb; font-size: 14px; }
+
+  .field-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  /* ── PAYMENT SELECTOR ── */
+  .payment-opt {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-bottom: 10px;
+  }
+
+  .payment-opt.selected {
+    border-color: var(--brand);
+    background: var(--brand-light);
+  }
+
+  .payment-icon {
+    width: 40px; height: 40px;
+    border-radius: 10px;
+    background: #f5f5f5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+  }
+
+  .payment-name { font-size: 14px; font-weight: 600; }
+  .payment-sub  { font-size: 12px; color: var(--muted); }
+
+  .payment-radio {
+    margin-left: auto;
+    width: 20px; height: 20px;
+    border-radius: 50%;
+    border: 2px solid var(--border);
+    background: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    flex-shrink: 0;
+  }
+
+  .payment-opt.selected .payment-radio {
+    border-color: var(--brand);
+    background: var(--brand);
+  }
+
+  .payment-opt.selected .payment-radio::after {
+    content: '';
+    width: 8px; height: 8px;
+    background: white;
+    border-radius: 50%;
+  }
+
+  /* ── CHECKOUT BUTTON ── */
+  .checkout-btn {
+    width: 100%;
+    background: var(--brand);
+    color: white;
+    border: none;
+    border-radius: var(--radius);
+    height: 54px;
+    font-family: 'Hind Siliguri', sans-serif;
+    font-size: 17px;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    transition: all 0.2s;
+    box-shadow: 0 4px 16px rgba(200,57,43,0.35);
+    letter-spacing: 0.3px;
+    margin-top: 20px;
+  }
+
+  .checkout-btn:active { transform: scale(0.98); background: var(--brand-dark); }
+
+  /* ── POPUP OVERLAY ── */
+  .overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    z-index: 1000;
+    align-items: flex-end;
+    justify-content: center;
+    backdrop-filter: blur(3px);
+  }
+
+  .overlay.open { display: flex; }
+
+  .popup {
+    background: var(--white);
+    border-radius: 24px 24px 0 0;
+    padding: 24px 20px 36px;
+    width: 100%;
+    max-width: 480px;
+    max-height: 90vh;
+    overflow-y: auto;
+    animation: slideUp 0.35s cubic-bezier(0.34,1.56,0.64,1);
+  }
+
+  @keyframes slideUp {
+    from { transform: translateY(100%); opacity: 0; }
+    to   { transform: translateY(0);    opacity: 1; }
+  }
+
+  .popup-handle {
+    width: 40px; height: 4px;
+    background: var(--border);
+    border-radius: 4px;
+    margin: 0 auto 20px;
+  }
+
+  .popup-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 6px;
+  }
+
+  .popup-sub {
+    font-size: 13px;
+    color: var(--muted);
+    text-align: center;
+    margin-bottom: 20px;
+  }
+
+  .order-detail-card {
+    background: var(--bg);
+    border-radius: var(--radius);
+    padding: 16px;
+    margin-bottom: 16px;
+  }
+
+  .od-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    font-size: 14px;
+    padding: 5px 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .od-row:last-child { border-bottom: none; }
+
+  .od-label { color: var(--muted); max-width: 45%; }
+  .od-value { font-weight: 600; color: var(--text); text-align: right; max-width: 55%; }
+
+  .od-total-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--brand-light);
+    border-radius: var(--radius-sm);
+    padding: 14px 16px;
+    margin-bottom: 20px;
+  }
+
+  .od-total-label { font-size: 15px; font-weight: 700; color: var(--brand); }
+  .od-total-val   { font-size: 22px; font-weight: 700; color: var(--brand); }
+
+  .place-order-btn {
+    width: 100%;
+    background: var(--brand);
+    color: white;
+    border: none;
+    border-radius: var(--radius);
+    height: 54px;
+    font-family: 'Hind Siliguri', sans-serif;
+    font-size: 17px;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    transition: all 0.2s;
+    box-shadow: 0 4px 16px rgba(200,57,43,0.35);
+  }
+
+  .place-order-btn:active { transform: scale(0.98); }
+
+  .cancel-btn {
+    width: 100%;
+    background: none;
+    color: var(--muted);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius);
+    height: 46px;
+    font-family: 'Hind Siliguri', sans-serif;
+    font-size: 15px;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: all 0.2s;
+  }
+
+  .cancel-btn:hover { background: var(--bg); }
+
+  /* ── SUCCESS POPUP ── */
+  .success-anim {
+    text-align: center;
+    padding: 30px 20px;
+  }
+
+  .success-circle {
+    width: 80px; height: 80px;
+    background: var(--success-light);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+    font-size: 38px;
+  }
+
+  .success-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--success);
+    margin-bottom: 8px;
+  }
+
+  .success-msg {
+    font-size: 14px;
+    color: var(--muted);
+    line-height: 1.7;
+  }
+
+  .order-id-tag {
+    display: inline-block;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 8px 20px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+    margin: 14px 0;
+  }
+
+  /* ── MISC ── */
+  .divider {
+    height: 1px;
+    background: var(--border);
+    margin: 10px 0;
+  }
+
+  .sticky-bottom {
+    position: sticky;
+    bottom: 0;
+    background: var(--white);
+    padding: 14px 18px;
+    border-top: 1px solid var(--border);
+    box-shadow: 0 -4px 20px rgba(0,0,0,0.08);
+  }
+
+  .trust-badges {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    margin: 14px 0;
+  }
+
+  .trust-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11px;
+    color: var(--muted);
+  }
+
+  .trust-icon { font-size: 14px; }
+
+  /* ── NOTICE STRIP ── */
+  .notice-strip {
+    background: linear-gradient(90deg, #1a1a1a, #2c2c2c);
+    color: white;
+    text-align: center;
+    padding: 9px 14px;
+    font-size: 12px;
+    letter-spacing: 0.5px;
+  }
+
+  /* ── SCROLLBAR ── */
+  .popup::-webkit-scrollbar { width: 4px; }
+  .popup::-webkit-scrollbar-track { background: transparent; }
+  .popup::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+  /* Required star */
+  .req { color: var(--brand); }
+</style>
+</head>
+<body>
+
+<!-- NOTICE STRIP -->
+<div class="notice-strip">🎉 সীমিত সময়ের অফার · আজই অর্ডার করুন</div>
+
+<!-- PRODUCT IMAGE GALLERY -->
+<div class="gallery-wrap" id="gallery">
+  <img id="mainImg" class="gallery-main"
+    src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=600&q=80"
+    alt="Product Image">
+  <div class="gallery-dots" id="galleryDots"></div>
+</div>
+
+<div class="gallery-thumbs" id="thumbs"></div>
+
+<!-- PRODUCT INFO -->
+<div class="product-info">
+  <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+    <span class="badge badge-success" id="stockBadge">✓ স্টকে আছে</span>
+    <span style="font-size:12px;color:var(--muted);">⭐ 4.8 (324 রিভিউ)</span>
+  </div>
+
+  <h1 class="product-name" id="productName">Premium Smart Watch</h1>
+  <p class="product-tagline" id="productTagline">আপনার জীবনকে স্মার্ট করুন — প্রতিটি মুহূর্তে</p>
+
+  <div class="price-row">
+    <span class="price-now" id="displayPrice">৳ ২,৪৯৯</span>
+    <span class="price-was" id="displayWas">৳ ৩,৫০০</span>
+    <span class="discount-badge" id="discountBadge">২৮% ছাড়</span>
+  </div>
+
+  <p class="desc-short" id="descShort">
+    অত্যাধুনিক প্রযুক্তি ও অনন্য ডিজাইনের সমন্বয়ে তৈরি এই স্মার্টওয়াচ। স্বাস্থ্য ট্র্যাকিং, নোটিফিকেশন, ও দীর্ঘস্থায়ী ব্যাটারি লাইফ সহ।
+  </p>
+  <button class="desc-toggle" onclick="toggleDesc()" id="descToggleBtn">আরো পড়ুন ▼</button>
+  <div class="desc-long" id="descLong">
+    এই প্রিমিয়াম স্মার্টওয়াচে রয়েছে হার্ট রেট মনিটর, স্লিপ ট্র্যাকার, স্টেপ কাউন্টার এবং ওয়াটার রেজিস্ট্যান্ট ডিজাইন। অ্যান্ড্রয়েড ও iOS উভয় ডিভাইসের সাথে সামঞ্জস্যপূর্ণ। ৭ দিনের ব্যাটারি ব্যাকআপ এবং ১.৬ ইঞ্চি AMOLED ডিসপ্লে। ৩০ দিনের রিটার্ন পলিসি সহ।
+  </div>
+</div>
+
+<!-- ORDER SECTION -->
+<div class="section">
+  <div class="section-title">অর্ডার করুন</div>
+
+  <!-- Quantity -->
+  <div class="qty-row">
+    <span class="qty-label">পরিমাণ</span>
+    <div class="qty-ctrl">
+      <button class="qty-btn" onclick="changeQty(-1)">−</button>
+      <input type="number" class="qty-num" id="qty" value="1" min="1" max="10" readonly>
+      <button class="qty-btn" onclick="changeQty(1)">+</button>
+    </div>
+  </div>
+
+  <!-- Delivery -->
+  <p style="font-size:14px;font-weight:600;margin-bottom:10px;">ডেলিভারি অপশন</p>
+  <div class="delivery-opts">
+    <div class="delivery-opt selected" id="del-inside" onclick="selectDelivery('inside')">
+      <div class="opt-check"></div>
+      <div class="delivery-opt-name">🏙️ ঢাকার ভেতরে</div>
+      <div class="delivery-opt-price">৳ ৬০</div>
+    </div>
+    <div class="delivery-opt" id="del-outside" onclick="selectDelivery('outside')">
+      <div class="opt-check"></div>
+      <div class="delivery-opt-name">🚚 ঢাকার বাইরে</div>
+      <div class="delivery-opt-price">৳ ১২০</div>
+    </div>
+  </div>
+
+  <!-- Price Summary -->
+  <div class="price-summary">
+    <div class="ps-row">
+      <span>পণ্যের মূল্য</span>
+      <span id="psBase">৳ ২,৪৯৯</span>
+    </div>
+    <div class="ps-row">
+      <span>পরিমাণ</span>
+      <span id="psQty">× ১</span>
+    </div>
+    <div class="ps-row ps-discount">
+      <span>ছাড়</span>
+      <span id="psDiscount">− ৳ ১,০০১</span>
+    </div>
+    <div class="ps-row">
+      <span>ডেলিভারি চার্জ</span>
+      <span id="psDelivery">৳ ৬০</span>
+    </div>
+    <div class="ps-row total">
+      <span>মোট পরিশোধ</span>
+      <span id="psTotal">৳ ২,৫৫৯</span>
+    </div>
+  </div>
+</div>
+
+<!-- BILLING FORM -->
+<div class="section">
+  <div class="section-title">ঠিকানা ও তথ্য</div>
+
+  <div class="field-group">
+    <label class="field-label">পূর্ণ নাম <span class="req">*</span></label>
+    <input type="text" class="field-input" id="fullName" placeholder="আপনার পূর্ণ নাম">
+  </div>
+
+  <div class="field-group">
+    <label class="field-label">মোবাইল নম্বর <span class="req">*</span></label>
+    <input type="tel" class="field-input" id="phone" placeholder="01XXXXXXXXX">
+  </div>
+
+  <div class="field-group">
+    <label class="field-label">সম্পূর্ণ ঠিকানা <span class="req">*</span></label>
+    <input type="text" class="field-input" id="address" placeholder="বাসা/রোড/এলাকা">
+  </div>
+
+  <div class="field-row">
+    <div class="field-group">
+      <label class="field-label">জেলা / শহর <span class="req">*</span></label>
+      <input type="text" class="field-input" id="city" placeholder="ঢাকা">
+    </div>
+    <div class="field-group">
+      <label class="field-label">পোস্ট কোড</label>
+      <input type="text" class="field-input" id="postal" placeholder="১২০০">
+    </div>
+  </div>
+</div>
+
+<!-- PAYMENT SECTION -->
+<div class="section" style="margin-bottom:100px;">
+  <div class="section-title">পেমেন্ট পদ্ধতি</div>
+
+  <div class="payment-opt selected" id="pay-cod" onclick="selectPayment('cod')">
+    <div class="payment-icon">💵</div>
+    <div>
+      <div class="payment-name">ক্যাশ অন ডেলিভারি</div>
+      <div class="payment-sub">পণ্য পেলে টাকা দিন</div>
+    </div>
+    <div class="payment-radio"></div>
+  </div>
+
+  <div class="trust-badges">
+    <div class="trust-item"><span class="trust-icon">🔒</span>১০০% নিরাপদ</div>
+    <div class="trust-item"><span class="trust-icon">🔄</span>৩০ দিন রিটার্ন</div>
+    <div class="trust-item"><span class="trust-icon">✓</span>অরিজিনাল পণ্য</div>
+  </div>
+</div>
+
+<!-- STICKY CHECKOUT -->
+<div class="sticky-bottom">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+    <div>
+      <div style="font-size:12px;color:var(--muted);">মোট পরিশোধ</div>
+      <div style="font-size:22px;font-weight:700;color:var(--brand);" id="stickyTotal">৳ ২,৫৫৯</div>
+    </div>
+    <button class="checkout-btn" style="width:auto;padding:0 28px;" onclick="openCheckout()">
+      অর্ডার করুন →
+    </button>
+  </div>
+</div>
+
+<!-- CHECKOUT POPUP -->
+<div class="overlay" id="checkoutOverlay" onclick="overlayClick(event)">
+  <div class="popup" id="checkoutPopup">
+    <div class="popup-handle"></div>
+    <div class="popup-title">অর্ডার নিশ্চিত করুন</div>
+    <div class="popup-sub">নিচের তথ্য যাচাই করুন এবং অর্ডার দিন</div>
+
+    <!-- Order Details -->
+    <div class="order-detail-card" id="popupDetails"></div>
+
+    <!-- Total -->
+    <div class="od-total-row">
+      <span class="od-total-label">সর্বমোট পরিশোধ</span>
+      <span class="od-total-val" id="popupTotal">৳ ২,৫৫৯</span>
+    </div>
+
+    <button class="place-order-btn" onclick="placeOrder()">
+      ✓ অর্ডার নিশ্চিত করুন
+    </button>
+    <button class="cancel-btn" onclick="closeCheckout()">বাতিল করুন</button>
+  </div>
+</div>
+
+<!-- SUCCESS POPUP -->
+<div class="overlay" id="successOverlay">
+  <div class="popup">
+    <div class="success-anim">
+      <div class="success-circle">✓</div>
+      <div class="success-title">অর্ডার সফল হয়েছে!</div>
+      <div class="order-id-tag" id="orderIdDisplay">#ORD-000000</div>
+      <div class="success-msg">আপনার অর্ডার গ্রহণ করা হয়েছে।<br>শীঘ্রই আপনার সাথে যোগাযোগ করা হবে।<br><br>অর্ডার ডিটেইলস PDF ডাউনলোড হচ্ছে...</div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── DATA ──
+const PRODUCT = {
+  name: "Premium Smart Watch",
+  originalPrice: 3500,
+  salePrice: 2499,
+  deliveryInside: 60,
+  deliveryOutside: 120,
+  stock: "in_stock"  // "in_stock" | "limited" | "out_of_stock"
+};
+
+const IMAGES = [
+  "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=600&q=80",
+  "https://images.unsplash.com/photo-1546868871-7041f2a55e12?w=600&q=80",
+  "https://images.unsplash.com/photo-1434493789847-2f02dc6ca35d?w=600&q=80",
+  "https://images.unsplash.com/photo-1508685096489-7aacd43bd3b1?w=600&q=80"
+];
+
+let currentImg = 0;
+let qty = 1;
+let delivery = 'inside';
+let payment = 'cod';
+
+// ── GALLERY ──
+function initGallery() {
+  const thumbContainer = document.getElementById('thumbs');
+  const dotsContainer  = document.getElementById('galleryDots');
+
+  IMAGES.forEach((src, i) => {
+    const thumb = document.createElement('img');
+    thumb.src = src; thumb.className = 'thumb' + (i===0?' active':'');
+    thumb.onclick = () => switchImage(i);
+    thumbContainer.appendChild(thumb);
+
+    const dot = document.createElement('div');
+    dot.className = 'dot' + (i===0?' active':'');
+    dot.onclick = () => switchImage(i);
+    dotsContainer.appendChild(dot);
+  });
+}
+
+function switchImage(i) {
+  currentImg = i;
+  const main = document.getElementById('mainImg');
+  main.style.opacity = '0';
+  setTimeout(() => { main.src = IMAGES[i]; main.style.opacity = '1'; }, 180);
+  document.querySelectorAll('.thumb').forEach((t,j) => t.classList.toggle('active', j===i));
+  document.querySelectorAll('.dot').forEach((d,j)  => d.classList.toggle('active', j===i));
+}
+
+// ── STOCK BADGE ──
+function initStock() {
+  const badge = document.getElementById('stockBadge');
+  if (PRODUCT.stock === 'limited') {
+    badge.className = 'badge badge-warning';
+    badge.textContent = '⚠ সীমিত স্টক';
+  } else if (PRODUCT.stock === 'out_of_stock') {
+    badge.className = 'badge badge-danger';
+    badge.textContent = '✕ স্টক শেষ';
+  }
+}
+
+// ── PRICE DISPLAY ──
+function toBn(n) {
+  return n.toLocaleString('bn-BD');
+}
+
+function initPrices() {
+  const disc = Math.round((1 - PRODUCT.salePrice / PRODUCT.originalPrice) * 100);
+  document.getElementById('displayPrice').textContent  = '৳ ' + toBn(PRODUCT.salePrice);
+  document.getElementById('displayWas').textContent    = '৳ ' + toBn(PRODUCT.originalPrice);
+  document.getElementById('discountBadge').textContent = disc + '% ছাড়';
+  document.getElementById('psBase').textContent        = '৳ ' + toBn(PRODUCT.salePrice);
+}
+
+function updatePriceSummary() {
+  const deliveryCharge = delivery === 'inside' ? PRODUCT.deliveryInside : PRODUCT.deliveryOutside;
+  const subtotal   = PRODUCT.salePrice * qty;
+  const wasTotal   = PRODUCT.originalPrice * qty;
+  const discAmount = wasTotal - subtotal;
+  const total      = subtotal + deliveryCharge;
+
+  document.getElementById('psQty').textContent      = '× ' + toBn(qty);
+  document.getElementById('psDiscount').textContent = '− ৳ ' + toBn(discAmount);
+  document.getElementById('psDelivery').textContent = '৳ ' + toBn(deliveryCharge);
+  document.getElementById('psTotal').textContent    = '৳ ' + toBn(total);
+  document.getElementById('stickyTotal').textContent = '৳ ' + toBn(total);
+}
+
+// ── QTY ──
+function changeQty(d) {
+  qty = Math.max(1, Math.min(10, qty + d));
+  document.getElementById('qty').value = qty;
+  updatePriceSummary();
+}
+
+// ── DELIVERY ──
+function selectDelivery(opt) {
+  delivery = opt;
+  document.getElementById('del-inside').classList.toggle('selected', opt==='inside');
+  document.getElementById('del-outside').classList.toggle('selected', opt==='outside');
+  updatePriceSummary();
+}
+
+// ── PAYMENT ──
+function selectPayment(opt) {
+  payment = opt;
+  document.getElementById('pay-cod').classList.toggle('selected', opt==='cod');
+}
+
+// ── DESC TOGGLE ──
+function toggleDesc() {
+  const dl  = document.getElementById('descLong');
+  const btn = document.getElementById('descToggleBtn');
+  dl.classList.toggle('open');
+  btn.textContent = dl.classList.contains('open') ? 'কম দেখুন ▲' : 'আরো পড়ুন ▼';
+}
+
+// ── CHECKOUT POPUP ──
+function openCheckout() {
+  const name    = document.getElementById('fullName').value.trim();
+  const phone   = document.getElementById('phone').value.trim();
+  const address = document.getElementById('address').value.trim();
+  const city    = document.getElementById('city').value.trim();
+
+  if (!name || !phone || !address || !city) {
+    alert('অনুগ্রহ করে সমস্ত প্রয়োজনীয় তথ্য পূরণ করুন (*)');
+    return;
+  }
+
+  const deliveryCharge = delivery === 'inside' ? PRODUCT.deliveryInside : PRODUCT.deliveryOutside;
+  const subtotal = PRODUCT.salePrice * qty;
+  const discAmount = (PRODUCT.originalPrice - PRODUCT.salePrice) * qty;
+  const total = subtotal + deliveryCharge;
+  const postal = document.getElementById('postal').value.trim();
+
+  const rows = [
+    ['পণ্যের নাম',       PRODUCT.name],
+    ['পূর্ণ নাম',        name],
+    ['মোবাইল নম্বর',    phone],
+    ['ঠিকানা',          address],
+    ['জেলা / শহর',      city + (postal ? ', ' + postal : '')],
+    ['ডেলিভারি',        delivery==='inside' ? 'ঢাকার ভেতরে' : 'ঢাকার বাইরে'],
+    ['পেমেন্ট পদ্ধতি',  'ক্যাশ অন ডেলিভারি'],
+    ['পরিমাণ',          qty + ' টি'],
+    ['পণ্য মূল্য',      '৳ ' + toBn(subtotal)],
+    ['ছাড়',            '− ৳ ' + toBn(discAmount)],
+    ['ডেলিভারি চার্জ',  '৳ ' + toBn(deliveryCharge)],
+  ];
+
+  const container = document.getElementById('popupDetails');
+  container.innerHTML = rows.map(([l, v]) =>
+    `<div class="od-row"><span class="od-label">${l}</span><span class="od-value">${v}</span></div>`
+  ).join('');
+
+  document.getElementById('popupTotal').textContent = '৳ ' + toBn(total);
+  document.getElementById('checkoutOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeCheckout() {
+  document.getElementById('checkoutOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function overlayClick(e) {
+  if (e.target === document.getElementById('checkoutOverlay')) closeCheckout();
+}
+
+// ── PLACE ORDER ──
+function placeOrder() {
+  const orderId = 'ORD-' + Date.now().toString().slice(-6);
+  document.getElementById('orderIdDisplay').textContent = '#' + orderId;
+  document.getElementById('checkoutOverlay').classList.remove('open');
+  document.getElementById('successOverlay').classList.add('open');
+  generatePDF(orderId);
+  setTimeout(() => { document.getElementById('successOverlay').classList.remove('open'); document.body.style.overflow = ''; }, 5000);
+}
+
+// ── PDF GENERATION ──
+function generatePDF(orderId) {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ unit: 'mm', format: 'a5' });
+
+  const name    = document.getElementById('fullName').value.trim();
+  const phone   = document.getElementById('phone').value.trim();
+  const address = document.getElementById('address').value.trim();
+  const city    = document.getElementById('city').value.trim();
+  const postal  = document.getElementById('postal').value.trim();
+  const deliveryCharge = delivery === 'inside' ? PRODUCT.deliveryInside : PRODUCT.deliveryOutside;
+  const subtotal = PRODUCT.salePrice * qty;
+  const discAmount = (PRODUCT.originalPrice - PRODUCT.salePrice) * qty;
+  const total = subtotal + deliveryCharge;
+  const now = new Date();
+  const dateStr = now.toLocaleDateString('en-BD', { year:'numeric', month:'long', day:'numeric' });
+  const timeStr = now.toLocaleTimeString('en-BD', { hour:'2-digit', minute:'2-digit' });
+
+  const W = doc.internal.pageSize.getWidth();
+  const H = doc.internal.pageSize.getHeight();
+
+  // Background
+  doc.setFillColor(250, 248, 245);
+  doc.rect(0, 0, W, H, 'F');
+
+  // Header band
+  doc.setFillColor(200, 57, 43);
+  doc.rect(0, 0, W, 28, 'F');
+
+  // Brand name
+  doc.setTextColor(255, 255, 255);
+  doc.setFontSize(16);
+  doc.setFont('helvetica', 'bold');
+  doc.text('ORDER CONFIRMATION', W / 2, 13, { align: 'center' });
+  doc.setFontSize(9);
+  doc.setFont('helvetica', 'normal');
+  doc.text('Thank you for your order!', W / 2, 21, { align: 'center' });
+
+  // Order ID & date
+  doc.setTextColor(200, 57, 43);
+  doc.setFontSize(11);
+  doc.setFont('helvetica', 'bold');
+  doc.text('Order #' + orderId, 14, 38);
+  doc.setTextColor(100, 100, 100);
+  doc.setFontSize(8);
+  doc.setFont('helvetica', 'normal');
+  doc.text(dateStr + ' at ' + timeStr, W - 14, 38, { align: 'right' });
+
+  // Divider
+  doc.setDrawColor(232, 227, 220);
+  doc.setLineWidth(0.4);
+  doc.line(14, 42, W - 14, 42);
+
+  // Section: Customer Info
+  let y = 50;
+  doc.setFillColor(244, 241, 237);
+  doc.roundedRect(12, y - 5, W - 24, 7, 2, 2, 'F');
+  doc.setTextColor(60, 60, 60);
+  doc.setFontSize(8);
+  doc.setFont('helvetica', 'bold');
+  doc.text('CUSTOMER INFORMATION', 16, y);
+  y += 9;
+
+  const customerRows = [
+    ['Full Name',    name],
+    ['Phone',        phone],
+    ['Address',      address],
+    ['City / Area',  city + (postal ? ', ' + postal : '')],
+    ['Delivery',     delivery === 'inside' ? 'Inside Dhaka' : 'Outside Dhaka'],
+    ['Payment',      'Cash on Delivery (COD)'],
+  ];
+
+  doc.setFont('helvetica', 'normal');
+  customerRows.forEach(([label, val]) => {
+    doc.setTextColor(130, 130, 130);
+    doc.setFontSize(8);
+    doc.text(label + ':', 16, y);
+    doc.setTextColor(30, 30, 30);
+    doc.setFontSize(8.5);
+    doc.text(String(val), 52, y);
+    y += 7;
+  });
+
+  y += 4;
+  doc.line(14, y, W - 14, y);
+  y += 7;
+
+  // Section: Order Summary
+  doc.setFillColor(244, 241, 237);
+  doc.roundedRect(12, y - 5, W - 24, 7, 2, 2, 'F');
+  doc.setTextColor(60, 60, 60);
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(8);
+  doc.text('ORDER SUMMARY', 16, y);
+  y += 9;
+
+  // Table header
+  doc.setFillColor(220, 215, 208);
+  doc.rect(12, y - 5, W - 24, 6, 'F');
+  doc.setTextColor(60, 60, 60);
+  doc.setFontSize(7.5);
+  doc.setFont('helvetica', 'bold');
+  doc.text('PRODUCT', 16, y);
+  doc.text('QTY', W / 2, y, { align: 'center' });
+  doc.text('AMOUNT', W - 16, y, { align: 'right' });
+  y += 7;
+
+  // Product row
+  doc.setFont('helvetica', 'normal');
+  doc.setTextColor(30, 30, 30);
+  doc.setFontSize(8.5);
+  doc.text(PRODUCT.name, 16, y);
+  doc.text(String(qty), W / 2, y, { align: 'center' });
+  doc.text('BDT ' + subtotal.toLocaleString(), W - 16, y, { align: 'right' });
+  y += 7;
+
+  doc.line(14, y, W - 14, y);
+  y += 6;
+
+  // Price breakdown
+  const summaryRows = [
+    ['Product Price (Unit)',  'BDT ' + PRODUCT.salePrice.toLocaleString(), false],
+    ['Original Price',        'BDT ' + (PRODUCT.originalPrice * qty).toLocaleString(), false],
+    ['Discount Applied',      '- BDT ' + discAmount.toLocaleString(), true],
+    ['Delivery Charge',       'BDT ' + deliveryCharge.toLocaleString(), false],
+  ];
+
+  doc.setFontSize(8);
+  summaryRows.forEach(([label, val, isDiscount]) => {
+    doc.setTextColor(isDiscount ? 27 : 100, isDiscount ? 122 : 100, isDiscount ? 69 : 100);
+    doc.text(label, 16, y);
+    doc.setTextColor(isDiscount ? 27 : 30, isDiscount ? 122 : 30, isDiscount ? 69 : 30);
+    doc.text(val, W - 16, y, { align: 'right' });
+    y += 6.5;
+  });
+
+  y += 2;
+  // Total box
+  doc.setFillColor(200, 57, 43);
+  doc.roundedRect(12, y, W - 24, 12, 3, 3, 'F');
+  doc.setTextColor(255, 255, 255);
+  doc.setFontSize(10);
+  doc.setFont('helvetica', 'bold');
+  doc.text('TOTAL PAYABLE', 18, y + 8);
+  doc.text('BDT ' + total.toLocaleString(), W - 18, y + 8, { align: 'right' });
+  y += 20;
+
+  // Footer
+  doc.setDrawColor(232, 227, 220);
+  doc.line(14, y, W - 14, y);
+  y += 8;
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(7.5);
+  doc.setTextColor(150, 150, 150);
+  doc.text('Payment Method: Cash on Delivery (COD)', W / 2, y, { align: 'center' });
+  y += 5;
+  doc.text('For support: support@yourstore.com | 01700-000000', W / 2, y, { align: 'center' });
+  y += 5;
+  doc.text('Thank you for shopping with us!', W / 2, y, { align: 'center' });
+
+  doc.save('Order_' + orderId + '.pdf');
+}
+
+// ── INIT ──
+initGallery();
+initStock();
+initPrices();
+updatePriceSummary();
+</script>
+</body>
+</html>
