@@ -1,45 +1,48 @@
 import mongoose  from "mongoose";
-import Admin from "./admin.model";
-
-const register = async(req, res) => {
-     try {
+import Admin from "./admin.model.js";
+import ApiError from "../../utils/ApiError.js";
+import { ApiResponse } from "../../utils/ApiResponse.js";
+import { asyncHandler } from "../../utils/asyncHandler.js";
+const register = asyncHandler(async(req, res) => {
+     
 
         const {username , email , password} = req.body ; 
 
         if(!username || !email || !password) 
-        {
-             res.status(400).json(
-             {
-                   
-                status : 404 ,
-                success : false , 
-                message : "All fields are required" 
-             }
-             )
-        }
+        throw  new ApiError(400,"all fields are required") 
 
-        const admin = Admin.create({
+
+        const isExistAdmin =await Admin.findOne({$or :[{email},{username}]}) ; 
+        if(isExistAdmin) 
+        throw new ApiError (400, "User Already Exists") 
+
+
+        const admin =await Admin.create({
             username , 
             email , 
             password 
         })
         if(!admin) 
-        {
-            res.status(500).json(
-             {
-                   
-                status : 500 ,
-                success : false , 
-                message : "something went wrong when creating admin" 
-             }
-        }
+       throw  new ApiError(500,"Error occured while creating admin")  ;
+         const createdAdmin = await Admin.findById(admin._id).select("-refreshToken -password") ; 
+        if(!createdAdmin) 
+        throw   new ApiError (500 ,"Database Error" ) 
+      
+        return res.status(201).json(
+         new ApiResponse(201,createdAdmin,"Admin created successfully") 
+        )
+
+       
 
         
+     } 
 
+) ; 
 
+const login = asyncHandler((req,res) => {
+     
+   
 
-        
-     } catch (error) {
-        
-     }
-}
+})
+
+export {register} ; 

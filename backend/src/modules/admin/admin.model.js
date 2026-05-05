@@ -1,4 +1,4 @@
-import mongoose, { model } from "mongoose";
+import mongoose from "mongoose";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken"
 
@@ -18,14 +18,16 @@ const adminSchema = new  mongoose.Schema({
     password : {
          type : String , 
          required : true  
-    }
+    },
+    refreshToken : String , 
+
 },{timestamps: true}) ; 
 
-adminSchema.pre("save", async function(next) {
-      if(!this.isModified("password")) return next() ; 
+adminSchema.pre("save", async function() {
+      if(!this.isModified("password")) return ; 
       const saltRounds = 12 ; 
        this.password = await bcrypt.hash(this.password,saltRounds) ; 
-      next() ; 
+     
 
 })
 adminSchema.methods.isPasswordCorrect = async function(password){
@@ -50,10 +52,10 @@ adminSchema.methods.generateAccessToken =   function() {
 )
 
 }
-adminSchema.methods.generateRefreshTOken =  function() {
+adminSchema.methods.generateRefreshToken =  function() {
     return jwt.sign(
        {id :this._id},
-      process.env.REFRESS_TOKEN_SECRET,
+      process.env.REFREASH_TOKEN_SECRET,
       {expiresIn : '1y'}
     )
       
