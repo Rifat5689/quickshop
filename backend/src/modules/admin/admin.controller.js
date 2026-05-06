@@ -58,7 +58,7 @@ const createdAdmin = await Admin.findById(admin._id)
 
 ) ; 
 
-const login = asyncHandler(async(req,res) => {
+const logIn = asyncHandler(async(req,res) => {
      
    const {identifier, password} = req.body ; 
    
@@ -89,5 +89,28 @@ const loggedInAdmin = await Admin.findById(admin._id)
 
 
 })
+const logOut =asyncHandler(async (req,res) =>{
 
-export {register,login} ; 
+   const admin = await Admin.findByIdAndUpdate(
+      req.admin?._id , 
+      {
+          $unset : {
+              refreshToken : 1 
+          }
+      },
+      {
+         new: true 
+      }
+   )  
+
+   return res.status(200).
+   clearCookie("accessToken",accessTokenOptions)
+   .clearCookie("refreshToken",refreshTokenOptions)
+   .json(
+      new ApiResponse(200,{}, "Admin logged out") 
+   )
+         
+
+});
+
+export {register,logIn,logOut} ; 
