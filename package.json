@@ -1,5 +1,8 @@
 {
   "dependencies": {
-    "react-router": "^7.14.2"
+    "cloudinary": "^2.10.0",
+    "multer": "^2.1.1",
+    "react-router": "^7.14.2",
+    "streamifier": "^0.1.1"
   }
 }
