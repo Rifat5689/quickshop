@@ -54,7 +54,7 @@ const createProduct = asyncHandler(async (req,res) =>{
 const getAllProducts = asyncHandler(async (req,res) => {
       
     const products =await Product.find() ; 
-     if(!products) throw new ApiError(500,"found no products") ; 
+     if(!products.length === 0) throw new ApiError(404,"No Product Found") ; 
      res.status(200).json(
         new ApiResponse(200,products,"all products are sent successfully" )
      )
