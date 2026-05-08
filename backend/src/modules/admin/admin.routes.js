@@ -11,7 +11,7 @@ router.route("/auth/register").post(register) ;
 router.route("/auth/login").post(logIn) ;
 
 
-router.use(verifyJwt) ;
+// router.use(verifyJwt) ;
 
 
 
