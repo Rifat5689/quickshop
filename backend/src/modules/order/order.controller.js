@@ -14,10 +14,10 @@ const createOrder = asyncHandler(async(req,res)=>
     const {productId, quantity:qn,shippingDetails} = req.body ; 
        
        if(!shippingDetails || !productId || !qn ) 
-        throw new ApiError(409, "Missing fields ") 
+        throw new ApiError(400, "Missing fields ") 
 
     const product =await  Product.findById(productId) ; 
-    if(!product) throw new ApiError(409 , "Product not found") ; 
+    if(!product) throw new ApiError(404 , "Product not found") ; 
     const orderItem = {
        
         productId : product._id , 

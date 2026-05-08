@@ -17,13 +17,13 @@ app.use(helmet()) ;
 import adminRouter from "../modules/admin/admin.routes.js";
 import productRouter from "../modules/product/product.routes.js";
 import categoryRouter from "../modules/category/category.routes.js";
-
+import orderRouter from "../modules/order/order.routes.js";
 //routes declaration 
 
 app.use("/api/v1/admin",adminRouter) ; 
 app.use("/api/v1/products",productRouter);
 app.use("/api/v1/categories",categoryRouter) ; 
-
+app.use("/api/v1/orders",orderRouter);
 
 app.use((err, req, res,next) => {
     const statusCode = err.statusCode || 500

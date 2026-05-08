@@ -34,7 +34,7 @@ const register = asyncHandler(async(req, res) => {
 
         const isExistAdmin =await Admin.findOne({$or :[{email},{username}]}) ; 
         if(isExistAdmin) 
-        throw new ApiError (400, "User Already Exists") 
+        throw new ApiError (404, "User Already Exists") 
 
 
         const admin =await Admin.create({

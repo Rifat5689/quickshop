@@ -9,7 +9,7 @@ import Product from "./product.model.js";
 
 
 const createProduct = asyncHandler(async (req,res) =>{
-      const {name ,description ,price, category, stock =0,discount =0} = req.body ; 
+      const {name ,description ,tagName , shortDescription , price, category, stock =0,discount =0} = req.body ; 
 
      if (!name || !price || !description || !category ) {
   throw new ApiError(400, "Mandatory fields are required");
@@ -31,6 +31,8 @@ const createProduct = asyncHandler(async (req,res) =>{
 
       const product = await Product.create({
           name ,
+          tagName , 
+          shortDescription ,
           slug ,
           description,
           price , 
@@ -58,13 +60,28 @@ const getAllProducts = asyncHandler(async (req,res) => {
      )
 })
 
-const getProductById = asyncHandler(async (req, res) =>{
-      const {id} = req.params ; 
-      const product = await Product.findById(id).select("-v") ; 
-      if(!product) throw new ApiError(500, "Product is not found  ") ; 
-      res.status(200,product, "Product is sent successfully") ; 
-      
-})
+const getProduct = asyncHandler(async(req,res) =>{
+    const { value } = req.params;
+
+    if (value.match(/^[0-9a-fA-F]{24}$/)) {
+        // It's an ID
+        const product = await Product.findById(value);
+        if(!product) new ApiError(404, "product not found") 
+        res.status(200).json(
+          new ApiResponse(200,product , "Product fetched successfully")
+        )
+    } else {
+        // It's a slug
+        const product = await Product.findOne({ slug: value });
+               if(!product) new ApiError(404, "product not found") 
+
+                res.status(200).json(
+          new ApiResponse(200,product , "Product fetched successfully")
+                )
+
+    }
+});
+
 const updateProductById= asyncHandler(async (req,res) =>{
      const {id} = req.params ; 
      const product = await Product.findById(id) ; 
@@ -100,4 +117,4 @@ const deleteProductById = asyncHandler(async (req,res) => {
        new ApiResponse(200,null, "Product deleted successfully"));
 })
 
-export {createProduct,getAllProducts, updateProductById, deleteProductById,getProductById} ; 
+export {createProduct,getAllProducts, updateProductById, deleteProductById,getProduct} ; 
