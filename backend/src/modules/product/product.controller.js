@@ -66,14 +66,14 @@ const getProduct = asyncHandler(async(req,res) =>{
     if (value.match(/^[0-9a-fA-F]{24}$/)) {
         // It's an ID
         const product = await Product.findById(value);
-        if(!product) new ApiError(404, "product not found") 
+        if(!product) throw  new ApiError(404, "product not found") 
         res.status(200).json(
           new ApiResponse(200,product , "Product fetched successfully")
         )
     } else {
         // It's a slug
         const product = await Product.findOne({ slug: value });
-               if(!product) new ApiError(404, "product not found") 
+               if(!product) throw new ApiError(404, "product not found") 
 
                 res.status(200).json(
           new ApiResponse(200,product , "Product fetched successfully")
