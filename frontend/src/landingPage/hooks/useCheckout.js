@@ -8,7 +8,7 @@ const useCheckout = ({product}) => {
   const [DeliveryPlace,setDeliveryPlace] = useState("dhaka") ; 
   const [shippingPrice, setShippingPrice] = useState(70) ; 
   const [payload, setPayload] = useState(null) ; 
-  const {submitOrder, isLoading ,error} = useOrder() ; 
+  const {submitOrder, isLoading} = useOrder() ; 
 
   const nameRef = useRef() ;
     const phoneRef = useRef() ;
@@ -21,17 +21,16 @@ const useCheckout = ({product}) => {
       if(value==="dhaka") setShippingPrice(70); 
       else setShippingPrice(120) ; 
   }
-  const handleQuantity = (value) =>
-  {
-     if(value) setQuantity(quantity +1 ) ; 
-     else setQuantity((quantity ) => Math.max(1, quantity - 1)) ; 
-  }
+    const handleQuantity = (value) => {
+      if (value) setQuantity((currentQuantity) => currentQuantity + 1); 
+      else setQuantity((currentQuantity) => Math.max(1, currentQuantity - 1)); 
+    }
 
   const total = useMemo(()=>{
       if (!product) return 0; 
     
      return calculateTotal(product?.price ,quantity , product?.discount , shippingPrice);
-  },[product?.price,quantity,product?.discount,shippingPrice]) ; 
+  },[product,quantity,shippingPrice]) ; 
   const handleOrderSummary =()=>{
      if(!product ) return ; 
     const shippigDetails = {

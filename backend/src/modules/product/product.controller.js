@@ -9,7 +9,7 @@ import Product from "./product.model.js";
 
 
 const createProduct = asyncHandler(async (req,res) =>{
-      const {name ,description ,tagName , shortDescription , price, category, stock =0,discount =0} = req.body ; 
+      const {name ,description ,title , subtitle , price, category, stock =0,discount =0} = req.body ; 
 
      if (!name || !price || !description || !category ) {
   throw new ApiError(400, "Mandatory fields are required");
@@ -31,8 +31,8 @@ const createProduct = asyncHandler(async (req,res) =>{
 
       const product = await Product.create({
           name ,
-          tagName , 
-          shortDescription ,
+          title , 
+          subtitle,
           slug ,
           description,
           price , 

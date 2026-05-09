@@ -18,8 +18,8 @@ const productSchema = new mongoose.Schema({
     required: true,
     trim: true
   },
-  tagName : String , 
-  shortDescription : String ,
+  title : String , 
+  subtitle : String ,
 
   description: {
     type: String,
