@@ -41,7 +41,13 @@ const usePageActions = () => {
         showToast('Page created', 'success')
       }
     },
-    onError: (error) => showToast(error?.message || 'Failed to create page', 'error'),
+    onError: (error) => {
+      const message =
+        error?.response?.data?.message ||
+        error?.message ||
+        'Failed to create page'
+      showToast(message, 'error')
+    },
   })
 
   const update = useMutation({

@@ -57,7 +57,12 @@ api.interceptors.response.use(
       })
     }
 
-    return Promise.reject(error)
+    const serverMessage = error?.response?.data?.message
+    return Promise.reject(
+      serverMessage
+        ? { message: serverMessage, response: error.response }
+        : error
+    )
   }
 )
 

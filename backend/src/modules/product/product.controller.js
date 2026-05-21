@@ -3,7 +3,11 @@ import { generateUniqueSlug, suggestUniqueSlug } from "../../services/slug.servi
 import ApiError from "../../utils/ApiError.js";
 import { ApiResponse } from "../../utils/ApiResponse.js";
 import { asyncHandler } from "../../utils/asyncHandler.js";
+import { parseFormNumber } from "../../utils/parseFormNumber.js";
 import Product from "./product.model.js";
+
+const normalizeStatus = (value) =>
+  value === "Live" || value === "Draft" ? value : "Draft";
 
 const pickBody = (body, fields) =>
   fields.reduce((acc, field) => {
@@ -13,12 +17,23 @@ const pickBody = (body, fields) =>
 
 const uploadImages = async (files) => {
   if (!files?.length) return null;
-  const result = await uploadMultipleToCloudinary(files);
-  if (!result) throw new ApiError(500, "Failed to upload images");
-  return result.map((file) => ({
-    url: file.secure_url,
-    public_id: file.public_id,
-  }));
+
+  try {
+    const result = await uploadMultipleToCloudinary(files);
+    if (!result?.length) throw new ApiError(500, "Failed to upload images");
+    return result.map((file) => ({
+      url: file.secure_url,
+      public_id: file.public_id,
+    }));
+  } catch (err) {
+    console.error("[Cloudinary]", err?.message || err);
+    throw new ApiError(
+      500,
+      err.message?.includes("Cloudinary is not configured")
+        ? err.message
+        : "Failed to upload images. Check Cloudinary settings on the server."
+    );
+  }
 };
 
 // ——— Storefront (public) ———
@@ -89,14 +104,22 @@ const createProduct = asyncHandler(async (req, res) => {
     subtitle = "",
     price,
     category,
-    stock = 0,
-    discount = 0,
-    status = "Draft",
+    stock,
+    discount,
+    status,
     url = "",
   } = req.body;
 
-  if (!name || price === undefined) {
-    throw new ApiError(400, "Name and price are required");
+  const parsedPrice = parseFormNumber(price, NaN);
+  const parsedStock = parseFormNumber(stock, 0);
+  const parsedDiscount = parseFormNumber(discount, 0);
+
+  if (!name?.trim()) {
+    throw new ApiError(400, "Name is required");
+  }
+
+  if (Number.isNaN(parsedPrice) || parsedPrice < 0) {
+    throw new ApiError(400, "A valid price is required");
   }
 
   const images = await uploadImages(req.files);
@@ -104,20 +127,28 @@ const createProduct = asyncHandler(async (req, res) => {
 
   const slug = await generateUniqueSlug(name, req.body.slug);
 
-  const product = await Product.create({
-    name,
-    title,
-    subtitle,
-    slug,
-    description,
-    price,
-    category: category || undefined,
-    stock,
-    discount,
-    status,
-    url,
-    images,
-  });
+  let product;
+  try {
+    product = await Product.create({
+      name: name.trim(),
+      title,
+      subtitle,
+      slug,
+      description,
+      price: parsedPrice,
+      category: category || undefined,
+      stock: parsedStock,
+      discount: parsedDiscount,
+      status: normalizeStatus(status),
+      url,
+      images,
+    });
+  } catch (err) {
+    if (err?.code === 11000) {
+      throw new ApiError(409, "This URL slug is already in use. Pick another slug.");
+    }
+    throw err;
+  }
 
   res
     .status(201)
@@ -134,15 +165,31 @@ const updateProductById = asyncHandler(async (req, res) => {
     "description",
     "title",
     "subtitle",
-    "price",
-    "stock",
-    "discount",
     "category",
-    "status",
     "url",
   ]);
 
   Object.assign(product, updates);
+
+  if (req.body.price !== undefined) {
+    const parsedPrice = parseFormNumber(req.body.price, NaN);
+    if (Number.isNaN(parsedPrice) || parsedPrice < 0) {
+      throw new ApiError(400, "A valid price is required");
+    }
+    product.price = parsedPrice;
+  }
+
+  if (req.body.stock !== undefined) {
+    product.stock = parseFormNumber(req.body.stock, 0);
+  }
+
+  if (req.body.discount !== undefined) {
+    product.discount = parseFormNumber(req.body.discount, 0);
+  }
+
+  if (req.body.status !== undefined) {
+    product.status = normalizeStatus(req.body.status);
+  }
 
   if (req.body.slug !== undefined || req.body.name !== undefined) {
     const slugSource =

@@ -16,9 +16,19 @@ const uploadSingle = (buffer) => {
 };
 
 export const uploadMultipleToCloudinary = async (files) => {
-  const uploadPromises = files.map((file) =>
-    uploadSingle(file.buffer)
-  );
+  const { CLOUDINARY_NAME, CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET } =
+    process.env;
 
+  if (
+    !(CLOUDINARY_NAME || CLOUDINARY_CLOUD_NAME) ||
+    !CLOUDINARY_API_KEY ||
+    !CLOUDINARY_API_SECRET
+  ) {
+    throw new Error(
+      "Cloudinary is not configured. Set CLOUDINARY_NAME (or CLOUDINARY_CLOUD_NAME), CLOUDINARY_API_KEY, and CLOUDINARY_API_SECRET on the server."
+    );
+  }
+
+  const uploadPromises = files.map((file) => uploadSingle(file.buffer));
   return await Promise.all(uploadPromises);
 };

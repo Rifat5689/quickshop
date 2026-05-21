@@ -53,9 +53,29 @@ app.use("/api/v1/categories",categoryRouter) ;
 app.use("/api/v1/orders",orderRouter);
 app.use("/api/v1/settings", settingsRouter);
 
-app.use((err, req, res,next) => {
-    const statusCode = err.statusCode || 500
-    const message = err.message || "Internal Server Error"
+app.use((err, req, res, next) => {
+    let statusCode = err.statusCode || 500
+    let message = err.message || "Internal Server Error"
+    let errors = err.errors || []
+
+    if (err.code === 11000) {
+        statusCode = 409
+        message = "This URL slug is already in use. Pick another slug."
+    } else if (err.name === "ValidationError") {
+        statusCode = 400
+        message = Object.values(err.errors || {})
+            .map((e) => e.message)
+            .join(", ") || "Validation failed"
+    } else if (err.name === "CastError") {
+        statusCode = 400
+        message = `Invalid value for ${err.path}`
+    } else if (err.name === "MulterError") {
+        statusCode = 400
+        message =
+            err.code === "LIMIT_FILE_SIZE"
+                ? "Each image must be under 5MB"
+                : err.message
+    }
 
     console.error(`[ERROR] ${req.method} ${req.originalUrl}:`, err)
 
@@ -63,9 +83,7 @@ app.use((err, req, res,next) => {
         success: false,
         statusCode,
         message,
-        errors: err.errors || [],
-        // SECURITY: Stack trace only in development to prevent info leakage in production
-       
+        errors,
     })
 })
 
