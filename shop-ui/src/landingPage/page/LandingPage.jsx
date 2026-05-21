@@ -2,6 +2,7 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import { useShopCopy } from "../../context/ShopSettingsContext";
 import BillingFrom from "../components/BillingFrom";
 import DeliveryOptions from "../components/DeliveryOptions";
 import OrderSummary from "../components/OrderSummary";
@@ -15,6 +16,7 @@ import useDocumentTitle from "../hooks/useDocumentTitle";
 
 const LandingPage = () => {
   const { slug } = useParams();
+  const { t } = useShopCopy();
   const {
     isProductLoading,
     product,
@@ -49,29 +51,22 @@ const LandingPage = () => {
   }, [payload]);
 
   const handleConfirmOrder = async () => {
-    // submit and then animate modal out; onClosed will clear payload
     const success = await submitOrder();
     if (success === null) return;
     setIsSummaryVisible(false);
     if (success) {
-      toast.success("অর্ডার সফল হয়েছে! শীঘ্রই যোগাযোগ করা হবে।", {
-        position: "top-right",
-      });
+      toast.success(t("orderSuccess"), { position: "top-right" });
     } else {
-      toast.error("অর্ডার সফল হয়নি। আবার চেষ্টা করুন।", {
-        position: "top-right",
-      });
+      toast.error(t("orderFailed"), { position: "top-right" });
     }
   };
 
   if (!slug) {
     return (
-      <div className="flex min-h-screen items-center justify-center px-6 text-center">
-        <div className="max-w-sm space-y-3 rounded-xl border border-[#e8e3dc] bg-white p-6">
-          <div className="text-lg font-semibold text-[#1f2937]">Open a product page</div>
-          <div className="text-sm text-[#6b6b6b]">
-            Use the shop URL from the admin panel, for example /your-product-slug
-          </div>
+      <div className="shop-page flex min-h-screen items-center justify-center px-6 text-center">
+        <div className="max-w-sm space-y-3 rounded-[var(--radius)] border border-[var(--border)] bg-[var(--white)] p-6">
+          <div className="text-lg font-semibold text-[var(--text)]">{t("openProduct")}</div>
+          <div className="text-sm text-[var(--muted)]">{t("openProductHint")}</div>
         </div>
       </div>
     );
@@ -79,26 +74,26 @@ const LandingPage = () => {
 
   if (isProductLoading) {
     return (
-      <div className="flex min-h-screen items-center justify-center">
-        <div className="h-10 w-10 animate-spin rounded-full border-4 border-gray-200 border-t-indigo-500" />
+      <div className="shop-page flex min-h-screen items-center justify-center">
+        <div className="h-10 w-10 animate-spin rounded-full border-4 border-[var(--border)] border-t-[var(--brand)]" />
       </div>
     );
   }
 
   if (!product) {
     return (
-      <div className="flex min-h-screen items-center justify-center px-6 text-center">
-        <div className="max-w-sm space-y-3 rounded-xl border border-[#e8e3dc] bg-white p-6">
-          <div className="text-lg font-semibold text-[#1f2937]">Landing page not found</div>
-          <div className="text-sm text-[#6b6b6b]">
-            {productError?.message || "Please check the URL or publish the product from the admin panel."}
+      <div className="shop-page flex min-h-screen items-center justify-center px-6 text-center">
+        <div className="max-w-sm space-y-3 rounded-[var(--radius)] border border-[var(--border)] bg-[var(--white)] p-6">
+          <div className="text-lg font-semibold text-[var(--text)]">{t("notFound")}</div>
+          <div className="text-sm text-[var(--muted)]">
+            {productError?.message || t("notFoundHint")}
           </div>
           <button
             type="button"
             onClick={() => window.location.reload()}
-            className="mt-2 inline-flex items-center justify-center rounded-md bg-[#c8392b] px-4 py-2 text-sm font-semibold text-white"
+            className="mt-2 inline-flex items-center justify-center rounded-[var(--radius-sm)] bg-[var(--brand)] px-4 py-2 text-sm font-semibold text-white"
           >
-            Try again
+            {t("tryAgain")}
           </button>
         </div>
       </div>
@@ -106,7 +101,7 @@ const LandingPage = () => {
   }
 
   return (
-    <div className="   text-[15px] font-normal leading-relaxed">
+    <div className="shop-page pb-24 text-[15px] leading-relaxed">
       <ProductDetails
         details={productDetails}
         onSelectImage={handleSelectImage}
@@ -132,23 +127,20 @@ const LandingPage = () => {
         isSubmitting={isSubmitting || isLocked}
         handleOrderSummary={handleOrderSummary}
       />
-      {(payload || isSummaryVisible) && (
-        <OrderSummary
-          open={isSummaryVisible}
-          payload={payload}
-          product={product}
-          total={total}
-          onRequestClose={() => setIsSummaryVisible(false)}
-          onClosed={() => handleCloseSummary()}
-          onCancel={() => {
-            // immediate cancel: clear payload and hide
-            handleCloseSummary();
-            setIsSummaryVisible(false);
-          }}
-          onConfirm={handleConfirmOrder}
-          isSubmitting={isSubmitting || isLocked}
-        />
-      )}
+      <OrderSummary
+        open={isSummaryVisible && Boolean(payload)}
+        payload={payload}
+        product={product}
+        total={total}
+        onRequestClose={() => setIsSummaryVisible(false)}
+        onClosed={() => handleCloseSummary()}
+        onCancel={() => {
+          handleCloseSummary();
+          setIsSummaryVisible(false);
+        }}
+        onConfirm={handleConfirmOrder}
+        isSubmitting={isSubmitting || isLocked}
+      />
       <ToastContainer autoClose={3000} hideProgressBar newestOnTop />
     </div>
   );

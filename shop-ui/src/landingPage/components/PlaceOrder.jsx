@@ -1,11 +1,14 @@
+import { useShopCopy } from "../../context/ShopSettingsContext";
 
 const PlaceOrder = ({ total, isSubmitting, handleOrderSummary }) => {
+  const { t } = useShopCopy();
+
   return (
-    <section className="sticky bottom-0 z-20 border-t border-[#e8e3dc] bg-white px-[18px] py-[14px]">
+    <section className="sticky bottom-0 z-20 border-t border-[var(--border)] bg-[var(--white)] px-[18px] py-3.5">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <div className="text-[12px] text-[#6b6b6b]">মোট পরিশোধ</div>
-          <div className="text-[22px] font-bold text-[#c8392b]">
+          <div className="text-[12px] text-[var(--muted)]">{t("totalPayable")}</div>
+          <div className="text-[22px] font-bold text-[var(--brand)]">
             ৳ {total.toLocaleString("bn-BD")}
           </div>
         </div>
@@ -13,9 +16,9 @@ const PlaceOrder = ({ total, isSubmitting, handleOrderSummary }) => {
           type="button"
           onClick={handleOrderSummary}
           disabled={isSubmitting}
-          className="inline-flex items-center justify-center rounded-[12px] bg-[#c8392b] px-6 py-[11px] text-[17px] font-bold text-white shadow-md transition hover:bg-[#9b2b1e] disabled:cursor-not-allowed disabled:opacity-60"
+          className="inline-flex h-[54px] items-center justify-center rounded-[var(--radius)] bg-[var(--brand)] px-6 text-[17px] font-bold tracking-wide text-white shadow-[0_4px_16px_rgba(200,57,43,0.35)] transition hover:bg-[var(--brand-dark)] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
         >
-          {isSubmitting ? "অপেক্ষা করুন..." : "অর্ডার করুন →"}
+          {isSubmitting ? t("pleaseWait") : t("orderNow")}
         </button>
       </div>
     </section>

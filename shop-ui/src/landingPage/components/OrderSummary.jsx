@@ -1,5 +1,5 @@
-
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { useShopCopy } from "../../context/ShopSettingsContext";
 
 const OrderSummary = ({
   open,
@@ -12,102 +12,123 @@ const OrderSummary = ({
   onCancel,
   isSubmitting,
 }) => {
+  const { t } = useShopCopy();
+  const [mounted, setMounted] = useState(false);
+  const [visible, setVisible] = useState(false);
+
   const quantity = payload?.quantity ?? 1;
   const shippingPrice = payload?.shippingDetails?.shippingPrice ?? 0;
 
   useEffect(() => {
-    if (open) return;
-    const t = setTimeout(() => {
-      onClosed?.();
-    }, 340);
-    return () => clearTimeout(t);
-  }, [open, onClosed]);
+    if (open) {
+      setMounted(true);
+      const frame = requestAnimationFrame(() => {
+        requestAnimationFrame(() => setVisible(true));
+      });
+      return () => cancelAnimationFrame(frame);
+    }
 
-  if (!payload || !product) return null;
+    setVisible(false);
+    const timer = setTimeout(() => {
+      setMounted(false);
+      onClosed?.();
+    }, 420);
+    return () => clearTimeout(timer);
+  }, [open]);
+
+  if (!mounted || !payload || !product) return null;
 
   const subtotal = product.price * quantity;
   const discountRate = product.discount ?? 0;
   const discountAmount = Math.round((subtotal * discountRate) / 100);
   const hasDiscount = discountRate > 0 && discountAmount > 0;
-  const animClass = open ? "animate-slide-up" : "animate-slide-down";
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-end justify-center bg-black/55 px-0 py-0 backdrop-blur-sm"
+      className={`order-overlay fixed inset-0 z-50 flex items-end justify-center bg-black/60 px-0 backdrop-blur-[3px] ${
+        visible ? "order-overlay--open" : ""
+      }`}
       onClick={onRequestClose}
+      role="presentation"
     >
       <div
-        className={`w-full max-w-[480px] rounded-t-[24px] bg-white px-4 pb-5 pt-4 shadow-xl ${animClass}`}
+        className={`order-sheet w-full max-w-[480px] rounded-t-[24px] bg-white px-5 pb-9 pt-5 shadow-[0_12px_40px_rgba(0,0,0,0.15)] ${
+          visible ? "order-sheet--open" : ""
+        }`}
         onClick={(event) => event.stopPropagation()}
+        role="dialog"
+        aria-modal="true"
       >
-        <div className="mx-auto mb-3 h-1 w-10 rounded-full bg-[#e8e3dc]" />
-        <h3 className="text-center text-[18px] font-bold text-[#1f2937]">
-          অর্ডার নিশ্চিত করুন
+        <div className="mx-auto mb-5 h-1 w-10 rounded bg-[var(--border)]" />
+
+        <h3 className="font-display text-center text-[20px] font-bold text-[var(--text)]">
+          {t("confirmOrderTitle")}
         </h3>
-        <p className="mt-1 text-center text-[12px] text-[#6b6b6b]">
-          নিচের মূল্য তালিকা যাচাই করুন
+        <p className="mt-1.5 text-center text-[13px] text-[var(--muted)]">
+          {t("confirmOrderSub")}
         </p>
 
-        <div className="mt-4 space-y-1 rounded-[12px] bg-[#faf8f5] p-3 text-[14px]">
-          <div className="flex items-start justify-between gap-3">
-            <span className="text-[#6b6b6b]">পণ্যের মূল্য</span>
-            <span className="text-right font-semibold text-[#1f2937]">
+        <div className="order-detail-card mt-5 rounded-[var(--radius)] bg-[var(--bg)] p-4">
+          <div className="flex items-start justify-between gap-3 border-b border-[var(--border)] py-2 text-[14px]">
+            <span className="max-w-[45%] text-[var(--muted)]">{t("productPrice")}</span>
+            <span className="max-w-[55%] text-right font-semibold text-[var(--text)]">
               ৳ {product.price.toLocaleString("bn-BD")}
             </span>
           </div>
-          <div className="flex items-start justify-between gap-3">
-            <span className="text-[#6b7280]">পরিমাণ</span>
-            <span className="text-right font-semibold text-[#1f2937]">{quantity} টি</span>
+          <div className="flex items-start justify-between gap-3 border-b border-[var(--border)] py-2 text-[14px]">
+            <span className="max-w-[45%] text-[var(--muted)]">{t("qtyMultiplier")}</span>
+            <span className="max-w-[55%] text-right font-semibold text-[var(--text)]">
+              {quantity} {t("pcs")}
+            </span>
           </div>
           {hasDiscount ? (
-            <div className="flex items-start justify-between gap-3 text-[#1a7a45]">
-              <span>ছাড়</span>
-              <span className="text-right font-semibold">
+            <div className="flex items-start justify-between gap-3 border-b border-[var(--border)] py-2 text-[14px] text-[var(--success)]">
+              <span className="max-w-[45%]">{t("discount")}</span>
+              <span className="max-w-[55%] text-right font-semibold">
                 − ৳ {discountAmount.toLocaleString("bn-BD")}
               </span>
             </div>
           ) : null}
-          <div className="flex items-start justify-between gap-3">
-            <span className="text-[#6b7280]">ডেলিভারি চার্জ</span>
-            <span className="text-right font-semibold text-[#1f2937]">
+          <div className="flex items-start justify-between gap-3 py-2 text-[14px]">
+            <span className="max-w-[45%] text-[var(--muted)]">{t("deliveryCharge")}</span>
+            <span className="max-w-[55%] text-right font-semibold text-[var(--text)]">
               ৳ {shippingPrice.toLocaleString("bn-BD")}
             </span>
           </div>
         </div>
 
-        <div className="mt-3 rounded-[12px] bg-[#fdecea] px-3 py-2.5 text-[16px] font-bold text-[#c8392b]">
-          <div className="flex items-center justify-between">
-            <span>সর্বমোট পরিশোধ</span>
-            <span>৳ {total.toLocaleString("bn-BD")}</span>
-          </div>
+        <div className="od-total-row mt-4 flex items-center justify-between rounded-[var(--radius-sm)] bg-[var(--brand-light)] px-4 py-3.5">
+          <span className="text-[15px] font-bold text-[var(--brand)]">{t("confirmTotal")}</span>
+          <span className="text-[22px] font-bold text-[var(--brand)]">
+            ৳ {total.toLocaleString("bn-BD")}
+          </span>
         </div>
 
-        <div className="mt-4 space-y-2.5">
+        <div className="mt-5 space-y-2.5">
           <button
             type="button"
             onClick={onConfirm}
             disabled={isSubmitting}
-            className="flex w-full items-center justify-center gap-2 rounded-[12px] bg-[#c8392b] py-[10px] text-[16px] font-bold text-white shadow-md transition hover:bg-[#9b2b1e] disabled:cursor-not-allowed disabled:opacity-60"
+            className="flex h-[54px] w-full items-center justify-center gap-2 rounded-[var(--radius)] bg-[var(--brand)] text-[17px] font-bold text-white shadow-[0_4px_16px_rgba(200,57,43,0.35)] transition hover:bg-[var(--brand-dark)] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
           >
             {isSubmitting ? (
               <>
                 <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white" />
-                অর্ডার করা হচ্ছে...
+                {t("confirming")}
               </>
             ) : (
-              "✓ অর্ডার নিশ্চিত করুন"
+              t("confirmBtn")
             )}
           </button>
           <button
             type="button"
             onClick={() => {
-              // immediate cancel: call onCancel if provided, else request close
               if (onCancel) onCancel();
               else onRequestClose();
             }}
-            className="w-full rounded-[12px] border border-[#e8e3dc] py-2.5 text-[15px] font-semibold text-[#6b6b6b] transition hover:bg-[#faf8f5]"
+            className="h-[46px] w-full rounded-[var(--radius)] border-[1.5px] border-[var(--border)] text-[15px] font-semibold text-[var(--muted)] transition hover:bg-[var(--bg)]"
           >
-            বাতিল করুন
+            {t("cancel")}
           </button>
         </div>
       </div>
