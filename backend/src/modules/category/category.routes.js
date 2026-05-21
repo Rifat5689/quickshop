@@ -1,10 +1,21 @@
 import { Router } from "express";
-import createCategory from "./category.controller.js";
+import {
+	createCategory,
+	getAllCategories,
+	getCategoryById,
+	updateCategory,
+	deleteCategory,
+} from "./category.controller.js";
+import verifyJwt from "../admin/admin.middleware.js";
 
+const router = Router();
 
+// Public - anyone can read categories
+router.route("/").get(getAllCategories);
+router.route("/:id").get(getCategoryById);
 
-const router = Router() ; 
+// Admin protected
+router.route("/").post(verifyJwt, createCategory);
+router.route("/:id").patch(verifyJwt, updateCategory).delete(verifyJwt, deleteCategory);
 
-router.route('/').post(createCategory) ; 
-
-export default router ; 
+export default router;

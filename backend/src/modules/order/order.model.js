@@ -54,13 +54,21 @@ const shippingDetailsSchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
-    
+    city: {
+      type: String,
+      trim: true,
+      default: "",
+    },
+    postal: {
+      type: String,
+      trim: true,
+      default: "",
+    },
     shippingPrice: {
       type: Number,
       required: true,
       default: 0,
     },
-
   },
   { _id: false }
 );
@@ -75,11 +83,11 @@ const orderSchema = new mongoose.Schema(
     
 
     orderItem: {
-     type : orderItemSchema , 
-     required : true 
+      type: orderItemSchema,
+      required: true,
     },
 
-    shippingAddress: {
+    shippingDetails: {
       type: shippingDetailsSchema,
       required: true,
     },
@@ -93,21 +101,14 @@ const orderSchema = new mongoose.Schema(
 
     orderStatus: {
       type: String,
-      enum: [
-        "Pending",
-        "Confirmed",
-        "Processing",
-        "Shipped",
-        "Delivered",
-        "Cancelled",
-      ],
+      enum: ["Pending", "Processing", "Shipped", "Delivered", "Cancelled"],
       default: "Pending",
     },
 
-    totalPrice : {
-         type : Number , 
-         default : 0 
-    }
+    totalPrice: {
+      type: Number,
+      default: 0,
+    },
 
   },
   {

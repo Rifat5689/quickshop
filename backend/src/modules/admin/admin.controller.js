@@ -3,6 +3,7 @@ import ApiError from "../../utils/ApiError.js";
 import { ApiResponse } from "../../utils/ApiResponse.js";
 import { asyncHandler } from "../../utils/asyncHandler.js";
 import { accessTokenOptions, refreshTokenOptions } from "../../utils/CookieOptions.js";
+import jwt from "jsonwebtoken";
 
 
 const generateAccessAndRefreshToken = async (id)=>{
@@ -113,4 +114,35 @@ const logOut =asyncHandler(async (req,res) =>{
 
 });
 
-export {register,logIn,logOut} ; 
+const getMe = asyncHandler(async (req, res) => {
+   if (!req.admin) throw new ApiError(401, "Unauthorized access");
+
+   return res
+      .status(200)
+      .json(new ApiResponse(200, req.admin, "Admin profile fetched"));
+});
+
+const refreshAccessToken = asyncHandler(async (req, res) => {
+   const token = req.cookies?.refreshToken || req.header('Authorization')?.replace("Bearer ", "");
+   if (!token) throw new ApiError(401, "Refresh token missing");
+
+   let decoded;
+   try {
+      decoded = jwt.verify(token, process.env.REFRESH_TOKEN_SECRET);
+   } catch (error) {
+      throw new ApiError(401, "Invalid refresh token");
+   }
+
+   const admin = await Admin.findById(decoded?.id);
+   if (!admin || admin.refreshToken !== token) {
+      throw new ApiError(401, "Refresh token invalid");
+   }
+
+   const accessToken = admin.generateAccessToken();
+   return res
+      .status(200)
+      .cookie("accessToken", accessToken, accessTokenOptions)
+      .json(new ApiResponse(200, { accessToken }, "Access token refreshed"));
+});
+
+export {register,logIn,logOut,getMe,refreshAccessToken} ; 

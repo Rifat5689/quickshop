@@ -1,0 +1,88 @@
+import {
+  RiDashboardLine,
+  RiFileListLine,
+  RiSettings4Line,
+  RiShoppingBag3Line,
+  RiTimeLine,
+  RiLoopRightLine,
+  RiTruckLine,
+  RiCheckDoubleLine,
+  RiEyeLine,
+} from 'react-icons/ri'
+import {
+  LazyAllOrdersPage,
+  LazyDeliveredOrdersPage,
+  LazyPendingOrdersPage,
+  LazyProcessingOrdersPage,
+  LazyShippedOrdersPage,
+  LazyLandingPagesPage,
+  LazyOverviewPage,
+  LazySettingsPage,
+  LazyViewsPage,
+} from './LazyRoutes'
+
+export const routeConfig = [
+  {
+    path: '/',
+    label: 'Overview',
+    icon: RiDashboardLine,
+    component: LazyOverviewPage,
+    group: 'main',
+  },
+  {
+    path: '/orders',
+    label: 'Orders',
+    icon: RiShoppingBag3Line,
+    component: LazyAllOrdersPage,
+    group: 'main',
+  },
+  {
+    path: '/orders/pending',
+    label: 'Pending',
+    icon: RiTimeLine,
+    component: LazyPendingOrdersPage,
+    group: 'main',
+  },
+  {
+    path: '/orders/processing',
+    label: 'Processing',
+    icon: RiLoopRightLine,
+    component: LazyProcessingOrdersPage,
+    group: 'main',
+  },
+  {
+    path: '/orders/shipped',
+    label: 'Shipped',
+    icon: RiTruckLine,
+    component: LazyShippedOrdersPage,
+    group: 'main',
+  },
+  {
+    path: '/orders/delivered',
+    label: 'Delivered',
+    icon: RiCheckDoubleLine,
+    component: LazyDeliveredOrdersPage,
+    group: 'main',
+  },
+  {
+    path: '/views',
+    label: 'Views',
+    icon: RiEyeLine,
+    component: LazyViewsPage,
+    group: 'main',
+  },
+  {
+    path: '/pages',
+    label: 'Landing Pages',
+    icon: RiFileListLine,
+    component: LazyLandingPagesPage,
+    group: 'content',
+  },
+  {
+    path: '/settings',
+    label: 'Settings',
+    icon: RiSettings4Line,
+    component: LazySettingsPage,
+    group: 'content',
+  },
+]

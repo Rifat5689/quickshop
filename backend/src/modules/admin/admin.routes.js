@@ -1,19 +1,16 @@
 import { Router } from "express";
-import { register,logIn, logOut } from "./admin.controller.js";
+import { register, logIn, logOut, getMe, refreshAccessToken } from "./admin.controller.js";
 import verifyJwt from "./admin.middleware.js";
 
+const router = Router();
 
+// Public auth routes
+router.route("/auth/register").post(register);
+router.route("/auth/login").post(logIn);
+router.route("/auth/refresh").post(refreshAccessToken);
 
-const router = Router() ; 
+// Logout should be protected
+router.route("/auth/logout").post(verifyJwt, logOut);
+router.route("/auth/me").get(verifyJwt, getMe);
 
-
-router.route("/auth/register").post(register) ; 
-router.route("/auth/login").post(logIn) ;
-
-
-// router.use(verifyJwt) ;
-
-
-
-router.route("/auth/logout").post(logOut)
-export default router ; 
+export default router;
