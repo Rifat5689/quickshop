@@ -90,7 +90,7 @@ const LandingPage = () => {
   }
 
   return (
-    <div className="mx-auto max-w-[480px] px-0 text-[15px] font-normal leading-relaxed">
+    <div className="   text-[15px] font-normal leading-relaxed">
       <ProductDetails
         details={productDetails}
         onSelectImage={handleSelectImage}
