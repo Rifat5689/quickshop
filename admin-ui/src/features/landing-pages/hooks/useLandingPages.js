@@ -4,7 +4,7 @@ import { queryKeys } from '../../../services/queryKeys'
 
 const useLandingPages = () => {
   return useQuery({
-    queryKey: queryKeys.pages.all,
+    queryKey: queryKeys.products.all,
     queryFn: landingPageService.getAll,
   })
 }

@@ -8,7 +8,14 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 
-const allowedOrigins = (process.env.CLIENT_URL || "")
+const defaultOrigins = [
+  "https://originsofbeautyadmin.web.app",
+  "https://originsofbeatuty.web.app",
+  "http://localhost:5173",
+  "http://localhost:5174",
+];
+
+const allowedOrigins = (process.env.CLIENT_URL || defaultOrigins.join(","))
   .split(",")
   .map((origin) => origin.trim())
   .filter(Boolean);
@@ -37,14 +44,12 @@ import adminRouter from "../modules/admin/admin.routes.js";
 import productRouter from "../modules/product/product.routes.js";
 import categoryRouter from "../modules/category/category.routes.js";
 import orderRouter from "../modules/order/order.routes.js";
-import pageRouter from "../modules/page/page.routes.js";
 //routes declaration 
 
 app.use("/api/v1/admin",adminRouter) ; 
 app.use("/api/v1/products",productRouter);
 app.use("/api/v1/categories",categoryRouter) ; 
 app.use("/api/v1/orders",orderRouter);
-app.use("/api/v1/pages",pageRouter);
 
 app.use((err, req, res,next) => {
     const statusCode = err.statusCode || 500

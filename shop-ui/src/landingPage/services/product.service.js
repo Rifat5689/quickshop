@@ -2,14 +2,7 @@ import { api } from "../../shared/api/axios";
 
 const getProduct = async (slug) => {
     const safeSlug = slug || "";
-    const result = await api.get(`/api/v1/pages/public/${safeSlug}`);
-
-    try {
-        await api.post(`/api/v1/pages/${safeSlug}/view`);
-    } catch {
-        // Ignore view logging failures to avoid blocking the landing page.
-    }
-
+    const result = await api.get(`/api/v1/products/public/${safeSlug}`);
     return result.data;
 };
 

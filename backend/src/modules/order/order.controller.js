@@ -5,7 +5,6 @@ import ApiError from "../../utils/ApiError.js";
 import User from "../user/user.model.js";
 import Order from "./order.model.js";
 import { ApiResponse } from "../../utils/ApiResponse.js";
-import Page from "../page/page.model.js";
 
 
 const createOrder = asyncHandler(async (req, res) => {
@@ -208,7 +207,7 @@ const getDashboardStats = asyncHandler(async (req, res) => {
 
     const avgOrderValue = totalOrders ? totalRevenue / totalOrders : 0;
 
-    const viewsSummaryResult = await Page.aggregate([
+    const viewsSummaryResult = await Product.aggregate([
         {
             $group: {
                 _id: null,

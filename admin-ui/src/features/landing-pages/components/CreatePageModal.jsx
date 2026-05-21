@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
-import { API_BASE_URL } from '../../../config/env'
+import { buildPageUrl } from '../../../config/env'
+import CopyButton from '../../../components/shared/CopyButton'
 import landingPageService from '../services/landingPageService'
 
 const toSlug = (value) =>
@@ -9,35 +10,34 @@ const toSlug = (value) =>
     .replace(/\s+/g, '-')
     .replace(/[^a-z0-9-]/g, '')
 
+const emptyForm = {
+  name: '',
+  slug: '',
+  title: '',
+  subtitle: '',
+  price: '',
+  discount: '',
+  stock: '',
+  status: 'Draft',
+  description: '',
+  images: [],
+}
+
 const CreatePageModal = ({ isOpen, onClose, onCreate }) => {
-  const [form, setForm] = useState({
-    name: '',
-    slug: '',
-    title: '',
-    subtitle: '',
-    price: '',
-    discount: '',
-    stock: '',
-    status: 'Draft',
-    description: '',
-    images: [],
-  })
+  const [form, setForm] = useState(emptyForm)
   const [imageError, setImageError] = useState('')
   const [isSlugTouched, setIsSlugTouched] = useState(false)
 
-  const pageBaseUrl = useMemo(() => {
-    const apiRoot = API_BASE_URL.replace(/\/api\/v1\/?$/, '')
-    return `${apiRoot}/pages`
-  }, [])
-
-  if (!isOpen) return null
+  const shopUrl = useMemo(() => buildPageUrl(form.slug), [form.slug])
 
   useEffect(() => {
+    if (!isOpen) return
+
     const source = isSlugTouched ? form.slug : form.name
     const prepared = toSlug(source)
 
     if (!prepared) {
-      setForm((prev) => ({ ...prev, slug: '' }))
+      setForm((prev) => (prev.slug === '' ? prev : { ...prev, slug: '' }))
       return undefined
     }
 
@@ -55,7 +55,14 @@ const CreatePageModal = ({ isOpen, onClose, onCreate }) => {
     }, 250)
 
     return () => clearTimeout(timer)
-  }, [form.name, form.slug, isSlugTouched])
+  }, [isOpen, form.name, form.slug, isSlugTouched])
+
+  useEffect(() => {
+    if (!isOpen) return
+    setForm(emptyForm)
+    setImageError('')
+    setIsSlugTouched(false)
+  }, [isOpen])
 
   const handleChange = (field) => (event) => {
     const value = event.target.value
@@ -96,20 +103,11 @@ const CreatePageModal = ({ isOpen, onClose, onCreate }) => {
       images: form.images,
     })
     setImageError('')
-    setForm({
-      name: '',
-      slug: '',
-      title: '',
-      subtitle: '',
-      price: '',
-      discount: '',
-      stock: '',
-      status: 'Draft',
-      description: '',
-      images: [],
-    })
+    setForm(emptyForm)
     setIsSlugTouched(false)
   }
+
+  if (!isOpen) return null
 
   return (
     <div className="overlay" onClick={onClose}>
@@ -129,8 +127,15 @@ const CreatePageModal = ({ isOpen, onClose, onCreate }) => {
           <div className="form-group">
             <label className="form-label">URL Slug</label>
             <input value={form.slug} onChange={handleChange('slug')} className="form-input mono" />
+          </div>
+          <div className="form-group">
+            <label className="form-label">Shop URL</label>
+            <div className="flex gap-2">
+              <input readOnly value={shopUrl} className="form-input mono flex-1" />
+              <CopyButton text={shopUrl} disabled={!form.slug} />
+            </div>
             <div className="mt-1 text-[11px]" style={{ color: 'var(--text3)' }}>
-              Auto URL: {pageBaseUrl}/{form.slug || 'your-slug'}
+              Opens in shop-ui when the page is Live. URL is copied automatically after you create the page.
             </div>
           </div>
           <div className="form-row">

@@ -1,7 +1,11 @@
+import { buildPageUrl } from '../../../config/env'
+import CopyButton from '../../../components/shared/CopyButton'
+
 const PreviewDrawer = ({ isOpen, page, onClose, onPrimary }) => {
   if (!isOpen || !page) return null
 
   const imageUrl = page.images?.[0]?.url
+  const shopUrl = page.url && page.url.length ? page.url : buildPageUrl(page.slug)
 
   return (
     <>
@@ -58,6 +62,21 @@ const PreviewDrawer = ({ isOpen, page, onClose, onPrimary }) => {
               <span className="badge-dot" />
               {page.status}
             </span>
+          </div>
+          <div className="detail-row !border-0">
+            <span className="detail-key">Shop URL</span>
+            <div className="flex items-center gap-2 min-w-0">
+              <a
+                href={shopUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="detail-val truncate text-[12px]"
+                style={{ color: 'var(--accent)' }}
+              >
+                {shopUrl}
+              </a>
+              <CopyButton text={shopUrl} />
+            </div>
           </div>
         </div>
         <div className="modal-footer">

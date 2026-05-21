@@ -106,8 +106,6 @@ const LandingPagesPage = () => {
         onClose={() => setEditPage(null)}
         onSave={(id, payload) => {
           update.mutate({ id, payload })
-          if (payload.status === 'Live') publish.mutate(id)
-          if (payload.status === 'Draft') unpublish.mutate(id)
           setEditPage(null)
         }}
         onDelete={(id) => {

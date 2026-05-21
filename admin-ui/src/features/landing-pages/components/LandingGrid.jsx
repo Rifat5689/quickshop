@@ -1,14 +1,15 @@
 import { RiExternalLinkLine } from 'react-icons/ri'
-import { API_BASE_URL } from '../../../config/env'
+import { buildPageUrl } from '../../../config/env'
+import CopyButton from '../../../components/shared/CopyButton'
 
 const LandingGrid = ({ pages = [], onOpen, onEdit, onPublish, onDelete, onOrders }) => {
-  const pageBaseUrl = API_BASE_URL.replace(/\/api\/v1\/?$/, '/pages')
 
   return (
     <div className="page-grid">
       {pages.map((p) => {
         const sold = p.stock ? Math.min(100, Math.round((p.orders / p.stock) * 100)) : 0
         const progressColor = sold > 70 ? 'var(--green)' : sold > 40 ? 'var(--amber)' : 'var(--accent)'
+        const pageUrl = p.url && p.url.length ? p.url : buildPageUrl(p.slug)
 
         return (
           <div key={p._id || p.slug} className="page-card">
@@ -68,7 +69,8 @@ const LandingGrid = ({ pages = [], onOpen, onEdit, onPublish, onDelete, onOrders
               </div>
               <div className="page-url-chip">
                 <RiExternalLinkLine className="shrink-0" style={{ color: 'var(--text3)' }} />
-                <span className="truncate">{pageBaseUrl}/{p.slug}</span>
+                <span className="truncate">{pageUrl}</span>
+                <CopyButton text={pageUrl} />
               </div>
               <div className="mt-3 flex gap-2 border-t pt-3" style={{ borderColor: 'var(--border)' }}>
                 <button type="button" className="btn btn-ghost btn-sm" onClick={() => onOpen(p.slug)}>

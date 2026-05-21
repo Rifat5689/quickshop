@@ -7,8 +7,8 @@ export const queryKeys = {
     shipped: ['orders', 'shipped'],
     delivered: ['orders', 'delivered'],
   },
-  pages: {
-    all: ['pages'],
+  products: {
+    all: ['products', 'landing'],
   },
   views: {
     all: ['views'],

@@ -11,9 +11,10 @@ import PriceBreakdown from "../components/PriceBreakdown";
 import ProductDetails from "../components/ProductDetails";
 import QuantitySelector from "../components/QuantitySelector";
 import useLandingPage from "../hooks/useLandingPage";
+import useDocumentTitle from "../hooks/useDocumentTitle";
 
 const LandingPage = () => {
-  const { slug = "premium-smart-watch-3" } = useParams();
+  const { slug } = useParams();
   const {
     isProductLoading,
     product,
@@ -39,6 +40,8 @@ const LandingPage = () => {
     handleCloseSummary,
   } = useLandingPage({ slug });
 
+  useDocumentTitle(slug);
+
   const [isSummaryVisible, setIsSummaryVisible] = useState(false);
 
   useEffect(() => {
@@ -61,6 +64,19 @@ const LandingPage = () => {
     }
   };
 
+  if (!slug) {
+    return (
+      <div className="flex min-h-screen items-center justify-center px-6 text-center">
+        <div className="max-w-sm space-y-3 rounded-xl border border-[#e8e3dc] bg-white p-6">
+          <div className="text-lg font-semibold text-[#1f2937]">Open a product page</div>
+          <div className="text-sm text-[#6b6b6b]">
+            Use the shop URL from the admin panel, for example /your-product-slug
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   if (isProductLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center">
@@ -75,7 +91,7 @@ const LandingPage = () => {
         <div className="max-w-sm space-y-3 rounded-xl border border-[#e8e3dc] bg-white p-6">
           <div className="text-lg font-semibold text-[#1f2937]">Landing page not found</div>
           <div className="text-sm text-[#6b6b6b]">
-            {productError?.message || "Please check the URL or publish the page from the admin panel."}
+            {productError?.message || "Please check the URL or publish the product from the admin panel."}
           </div>
           <button
             type="button"

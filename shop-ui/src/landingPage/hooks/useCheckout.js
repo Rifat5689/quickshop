@@ -60,7 +60,7 @@ const useCheckout = ({ product }) => {
     };
 
     setPayload({
-      productId: product.productId || product._id,
+      productId: product._id,
       quantity,
       shippingDetails,
     });

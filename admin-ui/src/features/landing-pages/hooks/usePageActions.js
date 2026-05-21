@@ -2,34 +2,44 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import landingPageService from '../services/landingPageService'
 import { queryKeys } from '../../../services/queryKeys'
 import useToast from '../../../hooks/useToast'
+import { buildPageUrl } from '../../../config/env'
 
 const usePageActions = () => {
   const queryClient = useQueryClient()
   const { showToast } = useToast()
 
   const refresh = () => {
-    queryClient.invalidateQueries({ queryKey: queryKeys.pages.all })
+    queryClient.invalidateQueries({ queryKey: queryKeys.products.all })
   }
 
   const upsertPage = (page) => {
-    queryClient.setQueryData(queryKeys.pages.all, (current = []) => {
+    queryClient.setQueryData(queryKeys.products.all, (current = []) => {
       const next = current.filter((item) => item._id !== page._id)
       return [page, ...next]
     })
   }
 
   const removePage = (id) => {
-    queryClient.setQueryData(queryKeys.pages.all, (current = []) =>
+    queryClient.setQueryData(queryKeys.products.all, (current = []) =>
       current.filter((item) => item._id !== id)
     )
   }
 
   const create = useMutation({
     mutationFn: landingPageService.create,
-    onSuccess: (page) => {
-      showToast('Page created', 'success')
+    onSuccess: async (page) => {
       if (page) upsertPage(page)
       refresh()
+      const url = page?.url || buildPageUrl(page?.slug)
+      try {
+        if (url) await navigator.clipboard.writeText(url)
+        showToast(
+          url ? 'Page created — shop URL copied to clipboard' : 'Page created',
+          'success'
+        )
+      } catch {
+        showToast('Page created', 'success')
+      }
     },
     onError: (error) => showToast(error?.message || 'Failed to create page', 'error'),
   })

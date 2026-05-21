@@ -1,25 +1,32 @@
 import Product from "../modules/product/product.model.js";
+import ApiError from "../utils/ApiError.js";
 import { createSlug } from "../utils/slug.util.js";
 
-export const generateUniqueSlug = async (name) => {
-  const baseSlug = createSlug(name);
+export const generateUniqueSlug = async (name, preferredSlug, excludeId = null) => {
+  const baseSlug = preferredSlug ? createSlug(preferredSlug) : createSlug(name);
 
-  // fetch all similar slugs in ONE query
-  const existingSlugs = await Product.find({
-    slug: new RegExp(`^${baseSlug}`)
-  }).select("slug");
-
-  if (!existingSlugs.length) return baseSlug;
-
-  const slugSet = new Set(existingSlugs.map((p) => p.slug));
-
-  let slug = baseSlug;
-  let counter = 1;
-
-  while (slugSet.has(slug)) {
-    slug = `${baseSlug}-${counter}`;
-    counter++;
+  if (!baseSlug) {
+    throw new ApiError(400, "Valid name or slug is required");
   }
 
-  return slug;
+  let candidate = baseSlug;
+  let suffix = 2;
+
+  while (true) {
+    const query = { slug: candidate };
+    if (excludeId) {
+      query._id = { $ne: excludeId };
+    }
+
+    const exists = await Product.exists(query);
+    if (!exists) return candidate;
+
+    candidate = `${baseSlug}-${suffix}`;
+    suffix += 1;
+  }
+};
+
+export const suggestUniqueSlug = async ({ name = "", slug = "", excludeId = null } = {}) => {
+  const source = slug || name;
+  return generateUniqueSlug(source, slug || undefined, excludeId);
 };
