@@ -1,4 +1,13 @@
-import { useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
+import { API_BASE_URL } from '../../../config/env'
+import landingPageService from '../services/landingPageService'
+
+const toSlug = (value) =>
+  value
+    .toLowerCase()
+    .trim()
+    .replace(/\s+/g, '-')
+    .replace(/[^a-z0-9-]/g, '')
 
 const CreatePageModal = ({ isOpen, onClose, onCreate }) => {
   const [form, setForm] = useState({
@@ -14,18 +23,51 @@ const CreatePageModal = ({ isOpen, onClose, onCreate }) => {
     images: [],
   })
   const [imageError, setImageError] = useState('')
+  const [isSlugTouched, setIsSlugTouched] = useState(false)
+
+  const pageBaseUrl = useMemo(() => {
+    const apiRoot = API_BASE_URL.replace(/\/api\/v1\/?$/, '')
+    return `${apiRoot}/pages`
+  }, [])
 
   if (!isOpen) return null
+
+  useEffect(() => {
+    const source = isSlugTouched ? form.slug : form.name
+    const prepared = toSlug(source)
+
+    if (!prepared) {
+      setForm((prev) => ({ ...prev, slug: '' }))
+      return undefined
+    }
+
+    const timer = setTimeout(async () => {
+      try {
+        const suggested = await landingPageService.suggestSlug({
+          name: form.name,
+          slug: prepared,
+        })
+        if (!suggested) return
+        setForm((prev) => (prev.slug === suggested ? prev : { ...prev, slug: suggested }))
+      } catch {
+        setForm((prev) => (prev.slug === prepared ? prev : { ...prev, slug: prepared }))
+      }
+    }, 250)
+
+    return () => clearTimeout(timer)
+  }, [form.name, form.slug, isSlugTouched])
 
   const handleChange = (field) => (event) => {
     const value = event.target.value
     const next = { ...form, [field]: value }
     if (field === 'name') {
-      next.slug = value
-        .toLowerCase()
-        .trim()
-        .replace(/\s+/g, '-')
-        .replace(/[^a-z0-9-]/g, '')
+      if (!isSlugTouched) {
+        next.slug = toSlug(value)
+      }
+    }
+    if (field === 'slug') {
+      next.slug = toSlug(value)
+      setIsSlugTouched(true)
     }
     setForm(next)
   }
@@ -66,6 +108,7 @@ const CreatePageModal = ({ isOpen, onClose, onCreate }) => {
       description: '',
       images: [],
     })
+    setIsSlugTouched(false)
   }
 
   return (
@@ -87,7 +130,7 @@ const CreatePageModal = ({ isOpen, onClose, onCreate }) => {
             <label className="form-label">URL Slug</label>
             <input value={form.slug} onChange={handleChange('slug')} className="form-input mono" />
             <div className="mt-1 text-[11px]" style={{ color: 'var(--text3)' }}>
-              Your shop URL will be /{form.slug || 'your-slug'}
+              Auto URL: {pageBaseUrl}/{form.slug || 'your-slug'}
             </div>
           </div>
           <div className="form-row">

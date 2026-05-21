@@ -1,7 +1,7 @@
 import { api } from "../../shared/api/axios";
 
 const getProduct = async (slug) => {
-    const safeSlug = slug || "premium-smart-watch-3";
+    const safeSlug = slug || "";
     const result = await api.get(`/api/v1/pages/public/${safeSlug}`);
 
     try {

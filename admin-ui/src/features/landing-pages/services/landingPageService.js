@@ -22,6 +22,16 @@ const getAll = async () => {
   return response.data?.data || []
 }
 
+const suggestSlug = async ({ name = '', slug = '', excludeId = '' } = {}) => {
+  const params = new URLSearchParams()
+  if (name) params.set('name', name)
+  if (slug) params.set('slug', slug)
+  if (excludeId) params.set('excludeId', excludeId)
+
+  const response = await api.get(`/pages/slug/suggest?${params.toString()}`)
+  return response.data?.data?.slug || ''
+}
+
 const create = async (payload) => {
   const productForm = buildProductFormData(payload)
   const productResponse = await api.post('/products', productForm, {
@@ -61,6 +71,7 @@ const update = async (id, payload) => {
 
   const pagePayload = {
     name: payload.name,
+    slug: payload.slug,
     title: payload.title,
     subtitle: payload.subtitle,
     price: Number(payload.price || 0),
@@ -94,4 +105,4 @@ const unpublish = async (id) => {
   return response.data?.data
 }
 
-export default { getAll, create, update, remove, publish, unpublish }
+export default { getAll, suggestSlug, create, update, remove, publish, unpublish }

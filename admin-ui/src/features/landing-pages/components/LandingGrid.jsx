@@ -1,6 +1,9 @@
 import { RiExternalLinkLine } from 'react-icons/ri'
+import { API_BASE_URL } from '../../../config/env'
 
-const LandingGrid = ({ pages = [], onOpen, onEdit, onPublish, onOrders }) => {
+const LandingGrid = ({ pages = [], onOpen, onEdit, onPublish, onDelete, onOrders }) => {
+  const pageBaseUrl = API_BASE_URL.replace(/\/api\/v1\/?$/, '/pages')
+
   return (
     <div className="page-grid">
       {pages.map((p) => {
@@ -65,7 +68,7 @@ const LandingGrid = ({ pages = [], onOpen, onEdit, onPublish, onOrders }) => {
               </div>
               <div className="page-url-chip">
                 <RiExternalLinkLine className="shrink-0" style={{ color: 'var(--text3)' }} />
-                <span className="truncate">localhost:4000/pages/{p.slug}</span>
+                <span className="truncate">{pageBaseUrl}/{p.slug}</span>
               </div>
               <div className="mt-3 flex gap-2 border-t pt-3" style={{ borderColor: 'var(--border)' }}>
                 <button type="button" className="btn btn-ghost btn-sm" onClick={() => onOpen(p.slug)}>
@@ -73,6 +76,9 @@ const LandingGrid = ({ pages = [], onOpen, onEdit, onPublish, onOrders }) => {
                 </button>
                 <button type="button" className="btn btn-ghost btn-sm flex-1" onClick={() => onEdit(p.slug)}>
                   Edit
+                </button>
+                <button type="button" className="btn act-cancel border btn-sm" onClick={() => onDelete?.(p.slug)}>
+                  Delete
                 </button>
                 {p.status !== 'Live' ? (
                   <button type="button" className="btn btn-accent btn-sm" onClick={() => onPublish(p.slug)}>

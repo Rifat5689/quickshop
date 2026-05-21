@@ -6,6 +6,7 @@ import {
   getPageViewsBySlug,
   getPublicPageBySlug,
   getAllPages,
+  suggestPageSlug,
   createPage,
   updatePage,
   deletePage,
@@ -23,6 +24,7 @@ router.route("/public/:slug").get(getPublicPageBySlug);
 // Admin protected
 router.use(verifyJwt);
 router.route("/").get(getAllPages).post(createPage);
+router.route("/slug/suggest").get(suggestPageSlug);
 router.route("/:id").put(updatePage).delete(deletePage);
 router.route("/:id/publish").patch(publishPage);
 router.route("/:id/unpublish").patch(unpublishPage);

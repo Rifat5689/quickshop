@@ -6,6 +6,7 @@ import usePageActions from '../hooks/usePageActions'
 import CreatePageModal from '../components/CreatePageModal'
 import EditPageModal from '../components/EditPageModal'
 import PreviewDrawer from '../components/PreviewDrawer'
+import ConfirmModal from '../../../components/shared/ConfirmModal'
 
 const LandingPagesPage = () => {
   const navigate = useNavigate()
@@ -14,6 +15,7 @@ const LandingPagesPage = () => {
   const [isCreateOpen, setCreateOpen] = useState(false)
   const [editPage, setEditPage] = useState(null)
   const [previewPage, setPreviewPage] = useState(null)
+  const [deleteTarget, setDeleteTarget] = useState(null)
 
   const mapped = useMemo(() => pages, [pages])
 
@@ -31,6 +33,18 @@ const LandingPagesPage = () => {
     const page = mapped.find((item) => item.slug === slug)
     if (!page) return
     publish.mutate(page._id)
+  }
+
+  const handleDeletePrompt = (slug) => {
+    const page = mapped.find((item) => item.slug === slug)
+    if (!page) return
+    setDeleteTarget(page)
+  }
+
+  const handleDeleteConfirm = () => {
+    if (!deleteTarget) return
+    remove.mutate(deleteTarget._id)
+    setDeleteTarget(null)
   }
 
   const handlePrimary = () => {
@@ -73,6 +87,7 @@ const LandingPagesPage = () => {
           onOpen={handlePreview}
           onEdit={handleEdit}
           onPublish={handlePublish}
+          onDelete={handleDeletePrompt}
           onOrders={() => navigate('/orders')}
         />
       )}
@@ -96,7 +111,10 @@ const LandingPagesPage = () => {
           setEditPage(null)
         }}
         onDelete={(id) => {
-          remove.mutate(id)
+          const page = mapped.find((item) => item._id === id)
+          if (page) {
+            setDeleteTarget(page)
+          }
           setEditPage(null)
         }}
       />
@@ -105,6 +123,18 @@ const LandingPagesPage = () => {
         page={previewPage}
         onClose={() => setPreviewPage(null)}
         onPrimary={handlePrimary}
+      />
+      <ConfirmModal
+        isOpen={Boolean(deleteTarget)}
+        title="Delete Landing Page"
+        message={
+          deleteTarget
+            ? `Are you sure you want to delete "${deleteTarget.name}"? This action cannot be undone.`
+            : ''
+        }
+        confirmLabel="Delete Page"
+        onConfirm={handleDeleteConfirm}
+        onClose={() => setDeleteTarget(null)}
       />
       <button
         type="button"

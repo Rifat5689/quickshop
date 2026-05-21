@@ -5,6 +5,33 @@ import { ApiResponse } from "../../utils/ApiResponse.js";
 import Page from "./page.model.js";
 import Product from "../product/product.model.js";
 
+const toSlug = (value = "") =>
+  slugify(String(value), { lower: true, strict: true, trim: true });
+
+const buildUniqueSlug = async (rawValue, excludeId = null) => {
+  const baseSlug = toSlug(rawValue);
+
+  if (!baseSlug) {
+    throw new ApiError(400, "Valid name or slug is required");
+  }
+
+  let candidate = baseSlug;
+  let suffix = 2;
+
+  while (true) {
+    const query = { slug: candidate };
+    if (excludeId) {
+      query._id = { $ne: excludeId };
+    }
+
+    const exists = await Page.exists(query);
+    if (!exists) return candidate;
+
+    candidate = `${baseSlug}-${suffix}`;
+    suffix += 1;
+  }
+};
+
 const recordView = asyncHandler(async (req, res) => {
   const { slug } = req.params;
 
@@ -118,6 +145,16 @@ const getAllPages = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, pages, "Pages fetched successfully"));
 });
 
+const suggestPageSlug = asyncHandler(async (req, res) => {
+  const { name = "", slug = "", excludeId = null } = req.query;
+  const source = slug || name;
+  const suggestedSlug = await buildUniqueSlug(source, excludeId || null);
+
+  res
+    .status(200)
+    .json(new ApiResponse(200, { slug: suggestedSlug }, "Slug suggested"));
+});
+
 const createPage = asyncHandler(async (req, res) => {
   const {
     name,
@@ -137,12 +174,7 @@ const createPage = asyncHandler(async (req, res) => {
     throw new ApiError(400, "Name and price are required");
   }
 
-  const safeSlug = slug
-    ? slug
-    : slugify(name, { lower: true, strict: true, trim: true });
-
-  const exists = await Page.findOne({ slug: safeSlug });
-  if (exists) throw new ApiError(409, "Slug already exists");
+  const safeSlug = await buildUniqueSlug(slug || name);
 
   const page = await Page.create({
     name,
@@ -167,6 +199,7 @@ const updatePage = asyncHandler(async (req, res) => {
     name,
     title,
     subtitle,
+    slug,
     productId,
     price,
     discount,
@@ -189,6 +222,11 @@ const updatePage = asyncHandler(async (req, res) => {
   if (description !== undefined) page.description = description;
   if (status !== undefined) page.status = status;
   if (images !== undefined) page.images = images;
+
+  if (slug !== undefined || name !== undefined) {
+    const slugSource = slug !== undefined ? slug : name;
+    page.slug = await buildUniqueSlug(slugSource, id);
+  }
 
   const updated = await page.save();
 
@@ -232,6 +270,7 @@ export {
   getPageViewsBySlug,
   getPublicPageBySlug,
   getAllPages,
+  suggestPageSlug,
   createPage,
   updatePage,
   deletePage,
