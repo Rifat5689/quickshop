@@ -5,7 +5,7 @@ export const API_BASE_URL =
 /** Shop-ui Firebase hosting URL (no trailing slash) */
 export const SHOP_BASE_URL =
 	
-	'https://originsofbeauty.web.app'
+	'https://originsofbeautydotcom.web.app'
 
 /** @deprecated Use SHOP_BASE_URL */
 export const PAGES_BASE_URL = SHOP_BASE_URL
