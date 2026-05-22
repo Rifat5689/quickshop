@@ -1,9 +1,15 @@
 import { useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
+import { useShopCopy } from "../../context/ProductLanguageContext";
 import { calculateTotal } from "../services/calculateTotal.service";
 import { useOrder } from "./userOrder";
 
+const scrollToTopSmooth = () => {
+  window.scrollTo({ top: 0, behavior: "smooth" });
+};
+
 const useCheckout = ({ product }) => {
+  const { t } = useShopCopy();
   const [quantity, setQuantity] = useState(1);
   const [DeliveryPlace, setDeliveryPlace] = useState("dhaka");
   const [shippingPrice, setShippingPrice] = useState(70);
@@ -16,8 +22,6 @@ const useCheckout = ({ product }) => {
       fullName: "",
       phone: "",
       address: "",
-      city: "",
-      postal: "",
     },
   });
 
@@ -49,21 +53,23 @@ const useCheckout = ({ product }) => {
       return;
     }
 
+    scrollToTopSmooth();
+
     const values = getValues();
     const shippingDetails = {
       fullName: values.fullName.trim(),
       phone: values.phone.trim(),
       address: values.address.trim(),
-      city: values.city.trim(),
-      postal: values.postal?.trim() || "",
       shippingPrice,
     };
 
-    setPayload({
-      productId: product._id,
-      quantity,
-      shippingDetails,
-    });
+    window.setTimeout(() => {
+      setPayload({
+        productId: product.productId || product._id,
+        quantity,
+        shippingDetails,
+      });
+    }, 280);
   };
 
   const handleCloseSummary = () => {
@@ -74,7 +80,6 @@ const useCheckout = ({ product }) => {
     if (!payload) return false;
     try {
       await submitOrder(payload);
-      // Do not clear payload here so the parent can animate the modal out
       return true;
     } catch (error) {
       console.log(error);
@@ -97,6 +102,7 @@ const useCheckout = ({ product }) => {
     isLocked,
     register,
     errors,
+    t,
   };
 };
 

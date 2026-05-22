@@ -1,7 +1,8 @@
-import { useShopCopy } from "../../context/ShopSettingsContext";
+import { useShopCopy } from "../../context/ProductLanguageContext";
 
 const PriceBreakdown = ({ quantity, shippingPrice, total, product }) => {
-  const { t } = useShopCopy();
+  const { t, locale } = useShopCopy();
+
   if (!product) return null;
 
   const subtotal = product.price * quantity;
@@ -10,29 +11,31 @@ const PriceBreakdown = ({ quantity, shippingPrice, total, product }) => {
   const hasDiscount = discountRate > 0 && discountAmount > 0;
 
   return (
-    <section className="shop-section !pt-0">
-      <div className="rounded-[var(--radius)] bg-[var(--bg)] p-3.5">
-        <div className="flex justify-between py-1 text-[14px] text-[var(--muted)]">
+    <section className="mt-2 bg-white px-4 py-4 sm:px-[18px]">
+      <div className="rounded-[12px] bg-[#faf8f5] p-[14px]">
+        <div className="flex items-center justify-between text-[14px] text-[#6b6b6b]">
           <span>{t("productPrice")}</span>
-          <span>৳ {product.price.toLocaleString("bn-BD")}</span>
+          <span>৳ {product.price.toLocaleString(locale)}</span>
         </div>
-        <div className="flex justify-between py-1 text-[14px] text-[var(--muted)]">
+        <div className="mt-1 flex items-center justify-between text-[14px] text-[#6b6b6b]">
           <span>{t("qtyMultiplier")}</span>
           <span>× {quantity}</span>
         </div>
         {hasDiscount ? (
-          <div className="flex justify-between py-1 text-[14px] text-[var(--success)]">
+          <div className="mt-1 flex items-center justify-between text-[14px] text-[#1a7a45]">
             <span>{t("discount")}</span>
-            <span>− ৳ {discountAmount.toLocaleString("bn-BD")}</span>
+            <span>− ৳ {discountAmount.toLocaleString(locale)}</span>
           </div>
         ) : null}
-        <div className="flex justify-between py-1 text-[14px] text-[var(--muted)]">
+        <div className="mt-1 flex items-center justify-between text-[14px] text-[#6b6b6b]">
           <span>{t("deliveryCharge")}</span>
-          <span>৳ {shippingPrice.toLocaleString("bn-BD")}</span>
+          <span>৳ {shippingPrice.toLocaleString(locale)}</span>
         </div>
-        <div className="mt-2 flex justify-between border-t-[1.5px] border-[var(--border)] pt-2.5 text-[17px] font-bold text-[var(--text)]">
-          <span>{t("totalPayable")}</span>
-          <span>৳ {total.toLocaleString("bn-BD")}</span>
+        <div className="mt-3 border-t border-[#e8e3dc] pt-3 text-[17px] font-semibold text-[#1f2937]">
+          <div className="flex items-center justify-between">
+            <span>{t("totalPayable")}</span>
+            <span>৳ {total.toLocaleString(locale)}</span>
+          </div>
         </div>
       </div>
     </section>

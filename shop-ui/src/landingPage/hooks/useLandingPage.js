@@ -1,11 +1,7 @@
 import useCheckout from "./useCheckout";
-import useProduct from "./useProduct";
 import useProductDetails from "./useProductDetails";
 
-const useLandingPage = ({ slug }) => {
-  const { isLoading: isProductLoading, data, error } = useProduct(slug);
-  const product = data?.data;
-
+const useLandingPage = ({ product }) => {
   const {
     details: productDetails,
     handleSelectImage,
@@ -18,8 +14,6 @@ const useLandingPage = ({ slug }) => {
   const checkout = useCheckout({ product });
 
   return {
-    isProductLoading,
-    productError: error,
     product,
     productDetails,
     handleSelectImage,

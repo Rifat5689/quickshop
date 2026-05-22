@@ -12,6 +12,7 @@ const buildProductFormData = (payload) => {
   formData.append('discount', String(payload.discount ?? 0))
   formData.append('stock', String(payload.stock ?? 0))
   formData.append('status', payload.status || 'Draft')
+  formData.append('language', payload.language === 'en' ? 'en' : 'bn')
   formData.append('url', buildPageUrl(payload.slug))
 
   if (payload.images?.length) {

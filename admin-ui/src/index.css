@@ -448,9 +448,13 @@
   }
 
   .stat-card {
-    @apply relative overflow-hidden rounded-[10px] border p-4 transition-all duration-200;
+    @apply relative flex items-start gap-3 overflow-hidden rounded-[10px] border p-4 transition-all duration-200;
     background: var(--bg2);
     border-color: var(--border);
+  }
+
+  .stat-card-body {
+    @apply min-w-0 flex-1;
   }
 
   .stat-card:hover {
@@ -474,7 +478,7 @@
   }
 
   .stat-val {
-    @apply mt-2 text-[22px] font-bold tracking-tight;
+    @apply mt-1 text-[22px] font-bold tracking-tight;
     font-family: var(--mono);
     color: var(--text);
   }
@@ -494,7 +498,7 @@
   }
 
   .stat-icon {
-    @apply float-right flex h-8 w-8 items-center justify-center rounded-lg;
+    @apply flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-lg;
   }
 
   /* Cards */
@@ -966,6 +970,73 @@
     color: var(--text3);
   }
 
+  .image-upload-input {
+    @apply sr-only;
+  }
+
+  .image-upload-trigger {
+    @apply mt-2 flex cursor-pointer items-center gap-3 rounded-[10px] border border-dashed px-4 py-3.5 transition-all duration-200;
+    border-color: rgba(99, 102, 241, 0.35);
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.06), rgba(99, 102, 241, 0.02));
+  }
+
+  .image-upload-trigger:hover {
+    border-color: rgba(99, 102, 241, 0.65);
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(99, 102, 241, 0.04));
+    box-shadow: 0 4px 14px rgba(99, 102, 241, 0.12);
+  }
+
+  .image-upload-trigger-icon {
+    @apply flex h-11 w-11 shrink-0 items-center justify-center rounded-[10px] text-[22px];
+    background: rgba(99, 102, 241, 0.15);
+    color: var(--accent);
+  }
+
+  .image-upload-trigger-text {
+    @apply flex min-w-0 flex-1 flex-col gap-0.5;
+  }
+
+  .image-upload-trigger-title {
+    @apply text-[13px] font-semibold;
+    color: var(--text);
+  }
+
+  .image-upload-trigger-sub {
+    @apply text-[11px];
+    color: var(--text3);
+  }
+
+  .image-upload-trigger-action {
+    @apply shrink-0 rounded-[7px] px-3 py-1.5 text-[11px] font-bold uppercase tracking-wide;
+    background: var(--accent);
+    color: #fff;
+  }
+
+  .image-upload-previews {
+    @apply mt-3 flex flex-wrap gap-2;
+  }
+
+  .image-upload-preview-item {
+    @apply relative overflow-hidden rounded-[8px] border;
+    border-color: var(--border);
+    background: var(--bg3);
+  }
+
+  .image-upload-thumb {
+    @apply block h-14 w-14 object-cover;
+  }
+
+  .image-upload-thumb-badge {
+    @apply absolute bottom-1 right-1 flex items-center gap-0.5 rounded px-1 py-0.5 text-[9px] font-bold;
+    background: rgba(0, 0, 0, 0.65);
+    color: #fff;
+  }
+
+  .image-upload-hint {
+    @apply mt-2 text-[11px];
+    color: var(--text3);
+  }
+
   /* Modals */
   .overlay {
     @apply fixed inset-0 z-[200] flex items-center justify-center p-4;
@@ -1129,7 +1200,7 @@
     color: var(--text);
   }
 
-  /* Bottom nav — mobile only */
+  /* Bottom nav — mobile only (icon left, label right) */
   .bottom-nav {
     display: none;
     position: fixed;
@@ -1137,24 +1208,31 @@
     left: 0;
     right: 0;
     z-index: 100;
-    height: 58px;
+    height: 60px;
+    padding: 0 6px;
     background: var(--bg2);
     border-top: 1px solid var(--border);
-    align-items: center;
-    justify-content: space-around;
+    align-items: stretch;
+    justify-content: stretch;
+    gap: 4px;
   }
 
   .bni {
-    @apply flex cursor-pointer flex-col items-center gap-0.5 rounded-lg px-4 py-1.5 transition-all duration-150;
+    @apply flex min-w-0 flex-1 cursor-pointer flex-row items-center justify-start gap-2 rounded-lg px-2.5 py-2 transition-all duration-200;
     color: var(--text3);
   }
 
   .bni.active {
     color: var(--accent2);
+    background: rgba(99, 102, 241, 0.1);
   }
 
-  .bni span {
-    @apply text-[10px] font-semibold;
+  .bni-icon {
+    @apply shrink-0 text-[20px];
+  }
+
+  .bni-label {
+    @apply truncate text-[10px] font-semibold leading-tight;
   }
 
   /* Notifications */
@@ -1312,7 +1390,17 @@
     padding: 0 12px;
   }
 
+  .tb-hamburger {
+    order: 1;
+    flex-shrink: 0;
+  }
+
+  .tb-back {
+    order: 2;
+  }
+
   .topbar .tb-search {
+    order: 3;
     flex: 1;
     min-width: 0;
     max-width: none;
@@ -1320,6 +1408,7 @@
   }
 
   .tb-nav-right {
+    order: 4;
     margin-left: 0;
     flex-shrink: 0;
   }

@@ -5,7 +5,7 @@ import app from "./src/app/app.js";
 import mongoose from "mongoose";
 import Product from "./src/modules/product/product.model.js";
 
-const port = process.env.PORT || 3000  ; 
+const port = process.env.PORT || 4000; 
 connectDb() ;
 
 app.listen(port , ()=> console.log("the app is running on port ",port)) ; 

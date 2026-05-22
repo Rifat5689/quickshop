@@ -5,13 +5,13 @@ import useOrders from '../../orders/hooks/useOrders'
 import { formatBDT } from '../../../utils/formatters/currencyFormatter'
 import {
   RiEyeLine,
-  RiMoneyDollarCircleLine,
-  RiFileList3Line,
-  RiTimeLine,
-  RiLoopRightLine,
-  RiCheckDoubleLine,
-  RiDownloadLine,
+  RiWallet3Line,
+  RiShoppingBag2Line,
+  RiTimer2Line,
+  RiLoader4Line,
+  RiCheckboxCircleLine,
 } from 'react-icons/ri'
+import { getBDTGreeting } from '../../../utils/greeting'
 import OrderModal from '../../orders/components/OrderModal'
 import CustomerCell from '../../../components/ui/CustomerCell'
 
@@ -28,9 +28,11 @@ const StatCard = ({ label, value, badge, badgeTone = 'neutral', iconBg, icon }) 
     <div className="stat-icon" style={{ background: iconBg }}>
       {icon}
     </div>
-    <div className="stat-label">{label}</div>
-    <div className="stat-val">{value}</div>
-    {badge && <div className={`stat-badge ${badgeTone}`}>{badge}</div>}
+    <div className="stat-card-body">
+      <div className="stat-label">{label}</div>
+      <div className="stat-val">{value}</div>
+      {badge ? <div className={`stat-badge ${badgeTone}`}>{badge}</div> : null}
+    </div>
   </div>
 )
 
@@ -41,21 +43,17 @@ const OverviewPage = () => {
 
   const chartData = useMemo(() => stats?.dailyOrders || [], [stats])
   const maxRevenue = Math.max(1, ...chartData.map((item) => item.revenue || 0))
+  const greeting = getBDTGreeting()
 
   return (
     <div className="space-y-6">
       <div className="page-header-row page-header">
         <div>
-          <h2 className="page-title">Good morning, Admin 👋</h2>
-          <p className="page-sub">
-            Today · {stats?.activeViewers || 0} active on landing pages
-          </p>
+          <h2 className="page-title">
+            {greeting}, Admin <span aria-hidden="true">👋</span>
+          </h2>
         </div>
         <div className="page-header-actions flex flex-wrap gap-2">
-          <button type="button" className="btn btn-ghost">
-            <RiDownloadLine />
-            Export
-          </button>
           <Link to="/orders" className="btn btn-accent">
             View all orders →
           </Link>
@@ -74,14 +72,14 @@ const OverviewPage = () => {
             badge="▲ +12.4%"
             badgeTone="up"
             iconBg="rgba(99,102,241,0.12)"
-            icon={<RiMoneyDollarCircleLine style={{ color: 'var(--accent2)' }} />}
+            icon={<RiWallet3Line style={{ color: 'var(--accent2)' }} />}
           />
           <StatCard
             label="Total Orders"
             value={stats?.totalOrders || 0}
             badge="all time"
             iconBg="rgba(99,102,241,0.1)"
-            icon={<RiFileList3Line style={{ color: 'var(--accent2)' }} />}
+            icon={<RiShoppingBag2Line style={{ color: 'var(--accent2)' }} />}
           />
           <StatCard
             label="Pending"
@@ -89,14 +87,14 @@ const OverviewPage = () => {
             badge="action needed"
             badgeTone="neutral"
             iconBg="rgba(244,63,94,0.1)"
-            icon={<RiTimeLine style={{ color: 'var(--red)' }} />}
+            icon={<RiTimer2Line style={{ color: 'var(--red)' }} />}
           />
           <StatCard
             label="Processing"
             value={stats?.processingOrders || 0}
             badge="in progress"
             iconBg="rgba(20,184,166,0.1)"
-            icon={<RiLoopRightLine style={{ color: 'var(--teal)' }} />}
+            icon={<RiLoader4Line style={{ color: 'var(--teal)' }} />}
           />
           <StatCard
             label="Delivered"
@@ -104,7 +102,7 @@ const OverviewPage = () => {
             badge="completed"
             badgeTone="up"
             iconBg="rgba(16,185,129,0.1)"
-            icon={<RiCheckDoubleLine style={{ color: 'var(--green)' }} />}
+            icon={<RiCheckboxCircleLine style={{ color: 'var(--green)' }} />}
           />
         </div>
       )}

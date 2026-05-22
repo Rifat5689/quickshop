@@ -51,8 +51,7 @@ export const SHOP_COPY = {
     notFound: "পণ্যের পেজ পাওয়া যায়নি",
     notFoundHint: "লিংক যাচাই করুন অথবা অ্যাডমিন থেকে পেজ প্রকাশ করুন।",
     tryAgain: "আবার চেষ্টা করুন",
-    openProduct: "পণ্যের পেজ খুলুন",
-    openProductHint: "অ্যাডমিন প্যানেলের শপ URL ব্যবহার করুন",
+    imageUnavailable: "ছবি পাওয়া যায়নি",
   },
   en: {
     limitedOffer: "🎉 Limited time offer — order today",
@@ -106,7 +105,6 @@ export const SHOP_COPY = {
     notFound: "Product page not found",
     notFoundHint: "Check the link or publish the product from admin.",
     tryAgain: "Try again",
-    openProduct: "Open a product page",
-    openProductHint: "Use the shop URL from the admin panel",
+    imageUnavailable: "Image not available",
   },
 };

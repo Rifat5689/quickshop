@@ -1,22 +1,32 @@
-import { useShopCopy } from "../../context/ShopSettingsContext";
+import { useState } from "react";
+import { useShopCopy } from "../../context/ProductLanguageContext";
 
 const PlaceOrder = ({ total, isSubmitting, handleOrderSummary }) => {
-  const { t } = useShopCopy();
+  const { t, locale } = useShopCopy();
+  const [pulse, setPulse] = useState(false);
+
+  const onOrderClick = () => {
+    setPulse(true);
+    window.setTimeout(() => setPulse(false), 450);
+    handleOrderSummary();
+  };
 
   return (
-    <section className="sticky bottom-0 z-20 border-t border-[var(--border)] bg-[var(--white)] px-[18px] py-3.5">
+    <section className="sticky bottom-0 z-20 border-t border-[#e8e3dc] bg-white px-[18px] py-[14px]">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <div className="text-[12px] text-[var(--muted)]">{t("totalPayable")}</div>
-          <div className="text-[22px] font-bold text-[var(--brand)]">
-            ৳ {total.toLocaleString("bn-BD")}
+          <div className="text-[12px] text-[#6b6b6b]">{t("totalPayable")}</div>
+          <div className="text-[22px] font-bold text-[#c8392b]">
+            ৳ {total.toLocaleString(locale)}
           </div>
         </div>
         <button
           type="button"
-          onClick={handleOrderSummary}
+          onClick={onOrderClick}
           disabled={isSubmitting}
-          className="inline-flex h-[54px] items-center justify-center rounded-[var(--radius)] bg-[var(--brand)] px-6 text-[17px] font-bold tracking-wide text-white shadow-[0_4px_16px_rgba(200,57,43,0.35)] transition hover:bg-[var(--brand-dark)] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
+          className={`inline-flex items-center justify-center rounded-[12px] bg-[#c8392b] px-6 py-[11px] text-[17px] font-bold text-white shadow-md transition hover:bg-[#9b2b1e] disabled:cursor-not-allowed disabled:opacity-60 ${
+            pulse ? "animate-pop" : ""
+          }`}
         >
           {isSubmitting ? t("pleaseWait") : t("orderNow")}
         </button>

@@ -22,6 +22,7 @@ const productSchema = new mongoose.Schema(
       trim: true,
     },
     url: { type: String, default: "" },
+    language: { type: String, enum: ["bn", "en"], default: "bn" },
     status: { type: String, enum: ["Draft", "Live"], default: "Draft" },
     price: { type: Number, required: true, min: 0 },
     category: {

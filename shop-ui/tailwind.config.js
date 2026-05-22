@@ -4,7 +4,6 @@ export default {
     extend: {
       fontFamily: {
         sans: ["Hind Siliguri", "sans-serif"],
-        display: ["Playfair Display", "serif"],
       },
     },
   },

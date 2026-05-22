@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { buildPageUrl } from '../../../config/env'
 import CopyButton from '../../../components/shared/CopyButton'
 import landingPageService from '../services/landingPageService'
+import ImageUploadField from './ImageUploadField'
 
 const toSlug = (value) =>
   value
@@ -20,6 +21,7 @@ const formFromPage = (page) => ({
   stock: page?.stock || 0,
   description: page?.description || '',
   status: page?.status || 'Draft',
+  language: page?.language === 'en' ? 'en' : 'bn',
   images: [],
 })
 
@@ -82,8 +84,8 @@ const EditPageModal = ({ isOpen, page, onClose, onSave, onDelete }) => {
     })
   }
 
-  const handleImages = (event) => {
-    setForm((prev) => ({ ...prev, images: event.target.files }))
+  const handleImages = (fileList) => {
+    setForm((prev) => ({ ...prev, images: fileList }))
     setImageError('')
   }
 
@@ -138,6 +140,13 @@ const EditPageModal = ({ isOpen, page, onClose, onSave, onDelete }) => {
               <input value={form.subtitle} onChange={handleChange('subtitle')} className="form-input" />
             </div>
           </div>
+          <div className="form-group">
+            <label className="form-label">Shop UI language (fixed labels)</label>
+            <select value={form.language} onChange={handleChange('language')} className="settings-select">
+              <option value="bn">Bangla — buttons, delivery, payment labels</option>
+              <option value="en">English — buttons, delivery, payment labels</option>
+            </select>
+          </div>
           <div className="section-label">Pricing</div>
           <div className="form-row">
             <div className="form-group">
@@ -170,15 +179,14 @@ const EditPageModal = ({ isOpen, page, onClose, onSave, onDelete }) => {
               className="form-input"
             />
           </div>
-          <div className="form-group">
-            <label className="form-label">Replace Images</label>
-            <input type="file" multiple accept="image/*" onChange={handleImages} className="form-input" />
-            {imageError ? (
-              <div className="mt-2 text-xs font-semibold" style={{ color: 'var(--red)' }}>
-                {imageError}
-              </div>
-            ) : null}
-          </div>
+          <ImageUploadField
+            label="Images"
+            replaceLabel
+            files={form.images}
+            existingImages={page?.images}
+            onChange={handleImages}
+            error={imageError}
+          />
         </div>
         <div className="modal-footer">
           <button

@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { buildPageUrl } from '../../../config/env'
 import CopyButton from '../../../components/shared/CopyButton'
 import landingPageService from '../services/landingPageService'
+import ImageUploadField from './ImageUploadField'
 
 const toSlug = (value) =>
   value
@@ -19,6 +20,7 @@ const emptyForm = {
   discount: '',
   stock: '',
   status: 'Draft',
+  language: 'bn',
   description: '',
   images: [],
 }
@@ -79,8 +81,8 @@ const CreatePageModal = ({ isOpen, onClose, onCreate }) => {
     setForm(next)
   }
 
-  const handleImages = (event) => {
-    setForm((prev) => ({ ...prev, images: event.target.files }))
+  const handleImages = (fileList) => {
+    setForm((prev) => ({ ...prev, images: fileList }))
     setImageError('')
   }
 
@@ -99,6 +101,7 @@ const CreatePageModal = ({ isOpen, onClose, onCreate }) => {
       discount: Number(form.discount || 0),
       stock: Number(form.stock || 0),
       status: form.status,
+      language: form.language,
       description: form.description,
       images: form.images,
     })
@@ -148,6 +151,16 @@ const CreatePageModal = ({ isOpen, onClose, onCreate }) => {
               <input value={form.subtitle} onChange={handleChange('subtitle')} className="form-input" />
             </div>
           </div>
+          <div className="form-group">
+            <label className="form-label">Shop UI language (fixed labels)</label>
+            <select value={form.language} onChange={handleChange('language')} className="settings-select">
+              <option value="bn">Bangla — buttons, delivery, payment labels</option>
+              <option value="en">English — buttons, delivery, payment labels</option>
+            </select>
+            <div className="mt-1 text-[11px]" style={{ color: 'var(--text3)' }}>
+              Product name, title, and description stay as you type them (Bangla or English).
+            </div>
+          </div>
           <div className="section-label">Pricing</div>
           <div className="form-row">
             <div className="form-group">
@@ -180,15 +193,13 @@ const CreatePageModal = ({ isOpen, onClose, onCreate }) => {
               className="form-input"
             />
           </div>
-          <div className="form-group">
-            <label className="form-label">Images (required)</label>
-            <input type="file" multiple accept="image/*" onChange={handleImages} className="form-input" />
-            {imageError ? (
-              <div className="mt-2 text-xs font-semibold" style={{ color: 'var(--red)' }}>
-                {imageError}
-              </div>
-            ) : null}
-          </div>
+          <ImageUploadField
+            label="Images"
+            required
+            files={form.images}
+            onChange={handleImages}
+            error={imageError}
+          />
         </div>
         <div className="modal-footer">
           <button type="button" onClick={onClose} className="btn btn-ghost flex-1">

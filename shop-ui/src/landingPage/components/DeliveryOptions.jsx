@@ -1,32 +1,32 @@
 import { FaCity, FaTruck } from "react-icons/fa";
-import { useShopCopy } from "../../context/ShopSettingsContext";
+import { useShopCopy } from "../../context/ProductLanguageContext";
 
 const DeliveryOptions = ({ DeliveryPlace, handleDeliveryPlace }) => {
-  const { t } = useShopCopy();
+  const { t, locale } = useShopCopy();
   const isDhaka = DeliveryPlace === "dhaka";
 
   return (
-    <section className="shop-section !pt-0">
-      <p className="mb-3.5 text-[14px] font-semibold text-[var(--text)]">
-        {t("deliveryOptions")}
-      </p>
+    <section className="bg-white px-4 pb-4 sm:px-[18px]">
+      <p className="text-[14px] font-semibold text-[#1f2937]">{t("deliveryOptions")}</p>
 
-      <div className="flex gap-2.5">
+      <div className="mt-3 flex gap-3">
         <button
           type="button"
           onClick={() => handleDeliveryPlace("dhaka")}
-          className={`relative flex-1 rounded-[var(--radius)] border-[1.5px] px-2.5 py-3 text-left transition ${
+          className={`relative flex-1 rounded-[12px] border px-3 py-3 text-left transition ${
             isDhaka
-              ? "border-[var(--brand)] bg-[var(--brand-light)]"
-              : "border-[var(--border)] bg-[var(--white)]"
+              ? "border-[#c8392b] bg-[#fdecea]"
+              : "border-[#e8e3dc] bg-white hover:border-[#c8392b]/40"
           }`}
         >
-          <span className="flex items-center gap-2 text-[13px] font-semibold text-[var(--text)]">
-            <FaCity className="text-[var(--brand)]" /> {t("dhakaInside")}
+          <span className="mb-1 flex items-center gap-2 text-[13px] font-semibold text-[#1f2937]">
+            <FaCity className="text-[#c8392b]" /> {t("dhakaInside")}
           </span>
-          <span className="mt-0.5 block text-[12px] text-[var(--muted)]">৳ ৭০</span>
+          <span className="text-[12px] text-[#6b7280]">
+            ৳ {(70).toLocaleString(locale)}
+          </span>
           {isDhaka ? (
-            <span className="absolute right-2 top-2 flex h-[18px] w-[18px] items-center justify-center rounded-full bg-[var(--brand)] text-[10px] text-white">
+            <span className="absolute right-2 top-2 inline-flex h-[18px] w-[18px] items-center justify-center rounded-full bg-[#c8392b] text-[10px] text-white">
               ✓
             </span>
           ) : null}
@@ -35,18 +35,20 @@ const DeliveryOptions = ({ DeliveryPlace, handleDeliveryPlace }) => {
         <button
           type="button"
           onClick={() => handleDeliveryPlace("outside")}
-          className={`relative flex-1 rounded-[var(--radius)] border-[1.5px] px-2.5 py-3 text-left transition ${
+          className={`relative flex-1 rounded-[12px] border px-3 py-3 text-left transition ${
             !isDhaka
-              ? "border-[var(--brand)] bg-[var(--brand-light)]"
-              : "border-[var(--border)] bg-[var(--white)]"
+              ? "border-[#c8392b] bg-[#fdecea]"
+              : "border-[#e8e3dc] bg-white hover:border-[#c8392b]/40"
           }`}
         >
-          <span className="flex items-center gap-2 text-[13px] font-semibold text-[var(--text)]">
-            <FaTruck className="text-[var(--brand)]" /> {t("dhakaOutside")}
+          <span className="mb-1 flex items-center gap-2 text-[13px] font-semibold text-[#1f2937]">
+            <FaTruck className="text-[#c8392b]" /> {t("dhakaOutside")}
           </span>
-          <span className="mt-0.5 block text-[12px] text-[var(--muted)]">৳ ১২০</span>
+          <span className="text-[12px] text-[#6b7280]">
+            ৳ {(120).toLocaleString(locale)}
+          </span>
           {!isDhaka ? (
-            <span className="absolute right-2 top-2 flex h-[18px] w-[18px] items-center justify-center rounded-full bg-[var(--brand)] text-[10px] text-white">
+            <span className="absolute right-2 top-2 inline-flex h-[18px] w-[18px] items-center justify-center rounded-full bg-[#c8392b] text-[10px] text-white">
               ✓
             </span>
           ) : null}
